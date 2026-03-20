@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#faf6ef"/>
+      <stop offset="100%" stop-color="#f3ead5"/>
+    </linearGradient>
+    <linearGradient id="goldLink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8d5a0"/>
+      <stop offset="50%" stop-color="#c6994a"/>
+      <stop offset="100%" stop-color="#b8862f"/>
+    </linearGradient>
+    <linearGradient id="goldLink2" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4b574"/>
+      <stop offset="100%" stop-color="#a07530"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#b8862f" flood-opacity="0.15"/>
+    </filter>
+    <radialGradient id="spotlight" cx="0.5" cy="0.48" r="0.45">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="800" fill="url(#bg)"/>
+  <rect width="600" height="800" fill="url(#spotlight)"/>
+
+  <!-- Chain bracelet - elegant draped chain -->
+  <g filter="url(#shadow)">
+    <!-- Link 1 -->
+    <ellipse cx="130" cy="340" rx="18" ry="10" fill="none" stroke="url(#goldLink)" stroke-width="3" opacity="0.8" transform="rotate(-25, 130, 340)"/>
+    <!-- Link 2 -->
+    <ellipse cx="165" cy="355" rx="18" ry="10" fill="none" stroke="url(#goldLink2)" stroke-width="3" opacity="0.85" transform="rotate(-15, 165, 355)"/>
+    <!-- Link 3 -->
+    <ellipse cx="200" cy="368" rx="18" ry="10" fill="none" stroke="url(#goldLink)" stroke-width="3" opacity="0.85" transform="rotate(-8, 200, 368)"/>
+    <!-- Link 4 -->
+    <ellipse cx="238" cy="378" rx="18" ry="10" fill="none" stroke="url(#goldLink2)" stroke-width="3" opacity="0.9" transform="rotate(-2, 238, 378)"/>
+    <!-- Link 5 -->
+    <ellipse cx="276" cy="385" rx="18" ry="10" fill="none" stroke="url(#goldLink)" stroke-width="3" opacity="0.9" transform="rotate(2, 276, 385)"/>
+    <!-- Link 6 - center -->
+    <ellipse cx="314" cy="387" rx="18" ry="10" fill="none" stroke="url(#goldLink2)" stroke-width="3.5" opacity="0.92" transform="rotate(5, 314, 387)"/>
+    <!-- Link 7 -->
+    <ellipse cx="352" cy="384" rx="18" ry="10" fill="none" stroke="url(#goldLink)" stroke-width="3" opacity="0.9" transform="rotate(10, 352, 384)"/>
+    <!-- Link 8 -->
+    <ellipse cx="388" cy="376" rx="18" ry="10" fill="none" stroke="url(#goldLink2)" stroke-width="3" opacity="0.88" transform="rotate(16, 388, 376)"/>
+    <!-- Link 9 -->
+    <ellipse cx="422" cy="362" rx="18" ry="10" fill="none" stroke="url(#goldLink)" stroke-width="3" opacity="0.85" transform="rotate(22, 422, 362)"/>
+    <!-- Link 10 -->
+    <ellipse cx="455" cy="345" rx="18" ry="10" fill="none" stroke="url(#goldLink2)" stroke-width="3" opacity="0.8" transform="rotate(28, 455, 345)"/>
+
+    <!-- Second row - slightly lower, offset for depth -->
+    <ellipse cx="148" cy="370" rx="16" ry="9" fill="none" stroke="url(#goldLink2)" stroke-width="2.5" opacity="0.6" transform="rotate(-20, 148, 370)"/>
+    <ellipse cx="183" cy="385" rx="16" ry="9" fill="none" stroke="url(#goldLink)" stroke-width="2.5" opacity="0.65" transform="rotate(-12, 183, 385)"/>
+    <ellipse cx="220" cy="396" rx="16" ry="9" fill="none" stroke="url(#goldLink2)" stroke-width="2.5" opacity="0.65" transform="rotate(-5, 220, 396)"/>
+    <ellipse cx="258" cy="404" rx="16" ry="9" fill="none" stroke="url(#goldLink)" stroke-width="2.5" opacity="0.7" transform="rotate(0, 258, 404)"/>
+    <ellipse cx="296" cy="407" rx="16" ry="9" fill="none" stroke="url(#goldLink2)" stroke-width="2.5" opacity="0.7" transform="rotate(3, 296, 407)"/>
+    <ellipse cx="334" cy="405" rx="16" ry="9" fill="none" stroke="url(#goldLink)" stroke-width="2.5" opacity="0.7" transform="rotate(8, 334, 405)"/>
+    <ellipse cx="370" cy="398" rx="16" ry="9" fill="none" stroke="url(#goldLink2)" stroke-width="2.5" opacity="0.65" transform="rotate(14, 370, 398)"/>
+    <ellipse cx="405" cy="386" rx="16" ry="9" fill="none" stroke="url(#goldLink)" stroke-width="2.5" opacity="0.6" transform="rotate(20, 405, 386)"/>
+    <ellipse cx="438" cy="370" rx="16" ry="9" fill="none" stroke="url(#goldLink2)" stroke-width="2.5" opacity="0.55" transform="rotate(26, 438, 370)"/>
+  </g>
+
+  <!-- Clasp -->
+  <g opacity="0.7">
+    <circle cx="118" cy="332" r="6" fill="none" stroke="#c6994a" stroke-width="2"/>
+    <circle cx="468" cy="336" r="6" fill="none" stroke="#c6994a" stroke-width="2"/>
+    <line x1="468" y1="330" x2="478" y2="325" stroke="#c6994a" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Subtle shadow beneath chain -->
+  <ellipse cx="300" cy="430" rx="180" ry="8" fill="#c6994a" opacity="0.04"/>
+
+  <!-- Brand text -->
+  <text x="300" y="740" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="8" fill="#c6994a" opacity="0.08" font-variant="small-caps">LUMIERE</text>
+</svg>

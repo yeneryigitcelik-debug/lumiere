@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#faf6ef"/>
+      <stop offset="100%" stop-color="#f3ead5"/>
+    </linearGradient>
+    <radialGradient id="pearl" cx="0.35" cy="0.3" r="0.65">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#faf8f2"/>
+      <stop offset="70%" stop-color="#f0e8d8"/>
+      <stop offset="100%" stop-color="#e0d4be"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#b8a888" flood-opacity="0.15"/>
+    </filter>
+    <filter id="pearlGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#d4c8b0" flood-opacity="0.2"/>
+    </filter>
+    <radialGradient id="spotlight" cx="0.5" cy="0.48" r="0.45">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="800" fill="url(#bg)"/>
+  <rect width="600" height="800" fill="url(#spotlight)"/>
+
+  <!-- Thin gold thread visible between pearls -->
+  <path d="M 110 365 Q 180 395 260 405 Q 340 410 420 395 Q 470 385 500 365"
+        fill="none" stroke="#c6994a" stroke-width="1" opacity="0.3"/>
+
+  <!-- Pearls along a gentle arc -->
+  <g filter="url(#pearlGlow)">
+    <!-- Pearl 1 -->
+    <circle cx="125" cy="360" r="18" fill="url(#pearl)" opacity="0.95"/>
+    <circle cx="119" cy="353" r="5" fill="#ffffff" opacity="0.4"/>
+
+    <!-- Pearl 2 -->
+    <circle cx="168" cy="374" r="19" fill="url(#pearl)" opacity="0.95"/>
+    <circle cx="162" cy="367" r="5" fill="#ffffff" opacity="0.4"/>
+
+    <!-- Pearl 3 -->
+    <circle cx="213" cy="386" r="20" fill="url(#pearl)" opacity="0.95"/>
+    <circle cx="207" cy="378" r="6" fill="#ffffff" opacity="0.4"/>
+
+    <!-- Pearl 4 -->
+    <circle cx="260" cy="394" r="20" fill="url(#pearl)" opacity="0.95"/>
+    <circle cx="254" cy="386" r="6" fill="#ffffff" opacity="0.45"/>
+
+    <!-- Pearl 5 - center, slightly larger -->
+    <circle cx="307" cy="398" r="21" fill="url(#pearl)" opacity="0.97"/>
+    <circle cx="300" cy="390" r="6" fill="#ffffff" opacity="0.5"/>
+
+    <!-- Pearl 6 -->
+    <circle cx="354" cy="394" r="20" fill="url(#pearl)" opacity="0.95"/>
+    <circle cx="348" cy="386" r="6" fill="#ffffff" opacity="0.45"/>
+
+    <!-- Pearl 7 -->
+    <circle cx="399" cy="385" r="19" fill="url(#pearl)" opacity="0.95"/>
+    <circle cx="393" cy="378" r="5" fill="#ffffff" opacity="0.4"/>
+
+    <!-- Pearl 8 -->
+    <circle cx="442" cy="372" r="18" fill="url(#pearl)" opacity="0.95"/>
+    <circle cx="436" cy="365" r="5" fill="#ffffff" opacity="0.4"/>
+
+    <!-- Pearl 9 -->
+    <circle cx="483" cy="356" r="17" fill="url(#pearl)" opacity="0.93"/>
+    <circle cx="477" cy="349" r="5" fill="#ffffff" opacity="0.35"/>
+  </g>
+
+  <!-- Clasp at ends -->
+  <g opacity="0.6">
+    <rect x="98" y="354" width="12" height="12" rx="2" fill="none" stroke="#c6994a" stroke-width="1.5" transform="rotate(-15, 104, 360)"/>
+    <rect x="496" y="348" width="12" height="12" rx="2" fill="none" stroke="#c6994a" stroke-width="1.5" transform="rotate(15, 502, 354)"/>
+  </g>
+
+  <!-- Subtle shadow beneath bracelet -->
+  <ellipse cx="305" cy="435" rx="200" ry="6" fill="#c6994a" opacity="0.03"/>
+
+  <!-- Brand text -->
+  <text x="300" y="740" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="8" fill="#c6994a" opacity="0.08" font-variant="small-caps">LUMIERE</text>
+</svg>

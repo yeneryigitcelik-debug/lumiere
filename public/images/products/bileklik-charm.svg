@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#faf6ef"/>
+      <stop offset="100%" stop-color="#f3ead5"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8d5a0"/>
+      <stop offset="50%" stop-color="#c6994a"/>
+      <stop offset="100%" stop-color="#b8862f"/>
+    </linearGradient>
+    <linearGradient id="gold2" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4b574"/>
+      <stop offset="100%" stop-color="#a07530"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#b8862f" flood-opacity="0.15"/>
+    </filter>
+    <filter id="charmShadow" x="-30%" y="-20%" width="160%" height="150%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#b8862f" flood-opacity="0.18"/>
+    </filter>
+    <radialGradient id="spotlight" cx="0.5" cy="0.48" r="0.45">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="800" fill="url(#bg)"/>
+  <rect width="600" height="800" fill="url(#spotlight)"/>
+
+  <!-- Main chain bracelet curve -->
+  <g filter="url(#shadow)">
+    <path d="M 110 350 Q 200 400 300 410 Q 400 400 490 350"
+          fill="none" stroke="url(#gold)" stroke-width="2.8" opacity="0.7"/>
+    <!-- Chain texture dots along the path -->
+    <circle cx="140" cy="360" r="1.5" fill="#c6994a" opacity="0.4"/>
+    <circle cx="175" cy="375" r="1.5" fill="#c6994a" opacity="0.4"/>
+    <circle cx="210" cy="387" r="1.5" fill="#c6994a" opacity="0.4"/>
+    <circle cx="245" cy="398" r="1.5" fill="#c6994a" opacity="0.4"/>
+    <circle cx="300" cy="408" r="1.5" fill="#c6994a" opacity="0.4"/>
+    <circle cx="355" cy="398" r="1.5" fill="#c6994a" opacity="0.4"/>
+    <circle cx="390" cy="387" r="1.5" fill="#c6994a" opacity="0.4"/>
+    <circle cx="425" cy="375" r="1.5" fill="#c6994a" opacity="0.4"/>
+    <circle cx="460" cy="360" r="1.5" fill="#c6994a" opacity="0.4"/>
+  </g>
+
+  <!-- Charm 1: Star (left) -->
+  <g filter="url(#charmShadow)" transform="translate(195, 395)">
+    <!-- Hanging link -->
+    <line x1="0" y1="-8" x2="0" y2="5" stroke="#c6994a" stroke-width="1.5" opacity="0.6"/>
+    <circle cx="0" cy="-8" r="3" fill="none" stroke="#c6994a" stroke-width="1" opacity="0.5"/>
+    <!-- Star -->
+    <path d="M 0 10 L 5 22 L 18 22 L 8 30 L 12 43 L 0 35 L -12 43 L -8 30 L -18 22 L -5 22 Z"
+          fill="url(#gold)" opacity="0.85"/>
+    <path d="M 0 16 L 3 23 L 11 23 L 5 28 L 7 35 L 0 30 L -7 35 L -5 28 L -11 23 L -3 23 Z"
+          fill="none" stroke="#e8d5a0" stroke-width="0.5" opacity="0.3"/>
+  </g>
+
+  <!-- Charm 2: Heart (center-left) -->
+  <g filter="url(#charmShadow)" transform="translate(280, 408)">
+    <!-- Hanging link -->
+    <line x1="0" y1="-6" x2="0" y2="5" stroke="#c6994a" stroke-width="1.5" opacity="0.6"/>
+    <circle cx="0" cy="-6" r="3" fill="none" stroke="#c6994a" stroke-width="1" opacity="0.5"/>
+    <!-- Heart -->
+    <path d="M 0 12
+             C 0 12 -3 6 -12 6
+             C -20 6 -22 14 -22 18
+             C -22 28 -12 35 0 45
+             C 12 35 22 28 22 18
+             C 22 14 20 6 12 6
+             C 3 6 0 12 0 12 Z"
+          fill="url(#gold2)" opacity="0.85"/>
+    <!-- Highlight -->
+    <ellipse cx="-6" cy="18" rx="4" ry="3" fill="#f0e4c4" opacity="0.2"/>
+  </g>
+
+  <!-- Charm 3: Circle/coin (center-right) -->
+  <g filter="url(#charmShadow)" transform="translate(370, 400)">
+    <!-- Hanging link -->
+    <line x1="0" y1="-8" x2="0" y2="4" stroke="#c6994a" stroke-width="1.5" opacity="0.6"/>
+    <circle cx="0" cy="-8" r="3" fill="none" stroke="#c6994a" stroke-width="1" opacity="0.5"/>
+    <!-- Circle charm -->
+    <circle cx="0" cy="22" r="18" fill="url(#gold)" opacity="0.82"/>
+    <circle cx="0" cy="22" r="18" fill="none" stroke="#d4b574" stroke-width="1.5" opacity="0.5"/>
+    <circle cx="0" cy="22" r="12" fill="none" stroke="#e8d5a0" stroke-width="0.6" opacity="0.3"/>
+    <!-- Highlight -->
+    <ellipse cx="-5" cy="16" rx="5" ry="4" fill="#f0e4c4" opacity="0.2"/>
+  </g>
+
+  <!-- Charm 4: Small teardrop (right) -->
+  <g filter="url(#charmShadow)" transform="translate(440, 378)">
+    <!-- Hanging link -->
+    <line x1="0" y1="-6" x2="0" y2="5" stroke="#c6994a" stroke-width="1.5" opacity="0.6"/>
+    <circle cx="0" cy="-6" r="3" fill="none" stroke="#c6994a" stroke-width="1" opacity="0.5"/>
+    <!-- Teardrop -->
+    <path d="M 0 8
+             C 0 8 -12 24 -12 32
+             C -12 38 -7 42 0 42
+             C 7 42 12 38 12 32
+             C 12 24 0 8 0 8 Z"
+          fill="url(#gold2)" opacity="0.82"/>
+  </g>
+
+  <!-- Clasp details -->
+  <g opacity="0.55">
+    <circle cx="102" cy="345" r="5" fill="none" stroke="#c6994a" stroke-width="1.5"/>
+    <circle cx="498" cy="345" r="5" fill="none" stroke="#c6994a" stroke-width="1.5"/>
+    <line x1="498" y1="340" x2="506" y2="336" stroke="#c6994a" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Subtle shadow beneath -->
+  <ellipse cx="300" cy="470" rx="170" ry="5" fill="#c6994a" opacity="0.03"/>
+
+  <!-- Brand text -->
+  <text x="300" y="740" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="8" fill="#c6994a" opacity="0.08" font-variant="small-caps">LUMIERE</text>
+</svg>

@@ -11,7 +11,7 @@ function MouseTracker({ children }: { children: React.ReactNode }) {
   const mouse = useRef({ x: 0, y: 0 });
   const smoothMouse = useRef({ x: 0, y: 0 });
 
-  const handlePointerMove = useCallback((e: THREE.Event & { point?: THREE.Vector3 }) => {
+  const handlePointerMove = useCallback((e: { point?: THREE.Vector3 }) => {
     if (e.point) {
       mouse.current.x = e.point.x * 0.15;
       mouse.current.y = e.point.y * 0.15;
@@ -33,7 +33,7 @@ function MouseTracker({ children }: { children: React.ReactNode }) {
       {/* Invisible plane to capture mouse */}
       <mesh
         position={[0, 0, 0]}
-        onPointerMove={handlePointerMove as never}
+        onPointerMove={handlePointerMove}
         visible={false}
       >
         <planeGeometry args={[30, 30]} />
@@ -186,9 +186,11 @@ function FloatingHoop({ position, delay, scale = 0.4 }: { position: [number, num
 
 // ═══ Altın parçacıklar - mouse'a tepki verir ═══
 function GoldDust() {
-  const count = 60;
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const count = isMobile ? 30 : 60;
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const { pointer } = useThree();
+  const dummy = useMemo(() => new THREE.Object3D(), []);
 
   const particles = useMemo(() => {
     return Array.from({ length: count }, () => ({
@@ -201,12 +203,11 @@ function GoldDust() {
       offset: Math.random() * Math.PI * 2,
       scale: 0.01 + Math.random() * 0.025,
     }));
-  }, []);
+  }, [count]);
 
   useFrame((state) => {
     if (!meshRef.current) return;
     const t = state.clock.elapsedTime;
-    const dummy = new THREE.Object3D();
 
     particles.forEach((p, i) => {
       // Base floating animation
@@ -288,7 +289,7 @@ export default function HeroCanvas() {
       camera={{ position: [0, 0.5, 7], fov: 38 }}
       style={{ background: "transparent" }}
       gl={{ antialias: true, alpha: true }}
-      dpr={[1, 1.5]}
+      dpr={[1, typeof window !== "undefined" && window.innerWidth < 768 ? 1 : 1.5]}
     >
       <ambientLight intensity={0.3} />
       <directionalLight position={[5, 8, 5]} intensity={1.2} color="#fff8ee" />

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getIyzipay } from "@/lib/iyzico";
+import { sendOrderConfirmation } from "@/lib/resend";
+import { formatPrice } from "@/lib/utils";
 
 export async function POST(request: Request) {
   const body = await request.formData();
@@ -40,9 +42,10 @@ export async function POST(request: Request) {
           },
         });
 
-        // Update discount code usage
+        // Fetch order with items for stock update and email
         const order = await prisma.order.findUnique({
           where: { id: conversationId },
+          include: { items: true },
         });
 
         if (order?.discountCode) {
@@ -50,6 +53,38 @@ export async function POST(request: Request) {
             where: { code: order.discountCode },
             data: { currentUses: { increment: 1 } },
           });
+        }
+
+        // Decrement stock
+        if (order?.items) {
+          for (const item of order.items) {
+            if (item.variantId) {
+              await prisma.productVariant.update({
+                where: { id: item.variantId },
+                data: { stockQuantity: { decrement: item.quantity } },
+              });
+            }
+            if (item.productId) {
+              await prisma.product.update({
+                where: { id: item.productId },
+                data: { stockQuantity: { decrement: item.quantity } },
+              });
+            }
+          }
+        }
+
+        // Send confirmation email
+        if (order?.customerEmail) {
+          sendOrderConfirmation({
+            to: order.customerEmail,
+            orderNumber: order.orderNumber,
+            total: formatPrice(Number(order.total)),
+            items: order.items.map((item) => ({
+              name: item.productName,
+              quantity: item.quantity,
+              price: formatPrice(Number(item.totalPrice)),
+            })),
+          }).catch(() => {});
         }
 
         const redirectUrl = new URL(

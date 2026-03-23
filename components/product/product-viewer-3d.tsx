@@ -3,6 +3,8 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { Box } from "lucide-react";
+import { useWebGLSupport } from "@/components/three/webgl-detector";
+import { CanvasErrorBoundary } from "@/components/three/canvas-error-boundary";
 
 const JewelryRing = dynamic(() => import("@/components/three/jewelry-ring"), { ssr: false });
 const JewelryNecklace = dynamic(() => import("@/components/three/jewelry-necklace"), { ssr: false });
@@ -15,6 +17,7 @@ interface ProductViewer3DProps {
 
 export function ProductViewer3D({ jewelryType }: ProductViewer3DProps) {
   const [show3D, setShow3D] = useState(false);
+  const webglSupported = useWebGLSupport();
 
   const getComponent = () => {
     switch (jewelryType) {
@@ -27,6 +30,8 @@ export function ProductViewer3D({ jewelryType }: ProductViewer3DProps) {
         return <JewelryRing className="aspect-square w-full" />;
     }
   };
+
+  if (webglSupported === false) return null;
 
   if (!show3D) {
     return (
@@ -48,7 +53,9 @@ export function ProductViewer3D({ jewelryType }: ProductViewer3DProps) {
 
   return (
     <div className="animate-scale-in relative overflow-hidden rounded-sm border border-gold-200 bg-gradient-to-br from-gold-50 to-cream">
-      {getComponent()}
+      <CanvasErrorBoundary>
+        {getComponent()}
+      </CanvasErrorBoundary>
       <button
         onClick={() => setShow3D(false)}
         className="absolute right-3 top-3 rounded-full bg-charcoal/60 px-3 py-1 text-[10px] text-white/80 backdrop-blur-sm transition-colors hover:bg-charcoal/80"

@@ -76,7 +76,15 @@ export default async function BlogPostPage({
       )}
 
       <div className="prose prose-stone mt-8 max-w-none">
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        <div
+          dangerouslySetInnerHTML={{
+            __html: post.content
+              .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+              .replace(/\son\w+\s*=\s*"[^"]*"/gi, "")
+              .replace(/\son\w+\s*=\s*'[^']*'/gi, "")
+              .replace(/javascript\s*:/gi, ""),
+          }}
+        />
       </div>
     </article>
   );

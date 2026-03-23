@@ -7,6 +7,7 @@ export interface CartItem {
   variantName?: string;
   quantity: number;
   slug: string;
+  categorySlug?: string;
 }
 
 export interface ProductWithRelations {

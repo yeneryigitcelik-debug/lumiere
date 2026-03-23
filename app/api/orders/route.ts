@@ -16,3 +16,38 @@ export async function GET() {
 
   return NextResponse.json({ orders });
 }
+
+export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const action = searchParams.get("action");
+  const id = searchParams.get("id");
+
+  if (action === "cancel" && id) {
+    const order = await prisma.order.findUnique({ where: { id } });
+
+    if (!order || order.userId !== session.user.id) {
+      return NextResponse.json({ error: "Sipariş bulunamadı" }, { status: 404 });
+    }
+
+    if (order.status !== "PENDING" && order.status !== "PAID") {
+      return NextResponse.json(
+        { error: "Bu sipariş iptal edilemez" },
+        { status: 400 }
+      );
+    }
+
+    await prisma.order.update({
+      where: { id },
+      data: { status: "CANCELLED" },
+    });
+
+    return NextResponse.json({ success: true });
+  }
+
+  return NextResponse.json({ error: "Geçersiz işlem" }, { status: 400 });
+}

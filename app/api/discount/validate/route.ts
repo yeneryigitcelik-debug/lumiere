@@ -39,9 +39,18 @@ export async function POST(request: Request) {
     );
   }
 
+  let discountAmount = 0;
+  if (discount.discountType === "PERCENTAGE") {
+    discountAmount = (subtotal || 0) * (Number(discount.discountValue) / 100);
+  } else {
+    discountAmount = Number(discount.discountValue);
+  }
+
   return NextResponse.json({
+    valid: true,
     code: discount.code,
     discountType: discount.discountType,
     discountValue: Number(discount.discountValue),
+    discountAmount,
   });
 }

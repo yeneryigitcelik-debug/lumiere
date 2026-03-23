@@ -1,12 +1,18 @@
-import Link from "next/link";
+"use client";
 
-export default async function PaymentSuccessPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ siparis?: string }>;
-}) {
-  const params = await searchParams;
-  const orderNumber = params.siparis;
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { useCartStore } from "@/stores/cart";
+
+function SuccessContent() {
+  const searchParams = useSearchParams();
+  const orderNumber = searchParams.get("siparis");
+  const clearCart = useCartStore((s) => s.clearCart);
+
+  useEffect(() => {
+    clearCart();
+  }, [clearCart]);
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-6 pt-24">
@@ -46,5 +52,19 @@ export default async function PaymentSuccessPage({
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[70vh] items-center justify-center pt-24">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-gold-200 border-t-gold-500" />
+        </div>
+      }
+    >
+      <SuccessContent />
+    </Suspense>
   );
 }

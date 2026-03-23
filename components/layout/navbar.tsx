@@ -8,7 +8,12 @@ import { useCartStore } from "@/stores/cart";
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const totalItems = useCartStore((s) => s.totalItems());
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -86,7 +91,7 @@ export function Navbar() {
               aria-label="Sepet"
             >
               <ShoppingBag size={19} strokeWidth={1.5} />
-              {totalItems > 0 && (
+              {hydrated && totalItems > 0 && (
                 <span className="absolute -right-2.5 -top-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-gold-500 text-[9px] font-medium text-white">
                   {totalItems}
                 </span>

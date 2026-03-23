@@ -35,6 +35,22 @@ export async function POST(request: Request) {
       );
     }
 
+    // Stock control
+    if (item.variantId) {
+      const variant = product.variants.find((v) => v.id === item.variantId);
+      if (variant && variant.stockQuantity < item.quantity) {
+        return NextResponse.json(
+          { error: `Stokta yeterli ürün yok: ${product.name} (${variant.name})` },
+          { status: 400 }
+        );
+      }
+    } else if (product.stockQuantity < item.quantity) {
+      return NextResponse.json(
+        { error: `Stokta yeterli ürün yok: ${product.name}` },
+        { status: 400 }
+      );
+    }
+
     let unitPrice = Number(product.price);
 
     if (item.variantId) {
@@ -126,7 +142,9 @@ export async function POST(request: Request) {
       email: shippingAddress.email || session?.user?.email || "",
       identityNumber: "11111111111",
       registrationAddress: shippingAddress.addressLine,
-      ip: "85.34.78.112",
+      ip: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+          request.headers.get("x-real-ip") ||
+          "127.0.0.1",
       city: shippingAddress.city,
       country: "Turkey",
     },

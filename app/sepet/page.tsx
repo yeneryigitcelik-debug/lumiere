@@ -81,7 +81,7 @@ export default function CartPage() {
                   </div>
                   <div>
                     <Link
-                      href={`/urunler/${item.slug}`}
+                      href={`/urunler/${item.categorySlug ? `${item.categorySlug}/` : ""}${item.slug}`}
                       className="font-serif text-sm font-medium text-charcoal transition-colors hover:text-gold-700"
                     >
                       {item.name}

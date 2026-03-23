@@ -3,6 +3,8 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { useWebGLSupport, WebGLFallback } from "@/components/three/webgl-detector";
+import { CanvasErrorBoundary } from "@/components/three/canvas-error-boundary";
 
 const HeroCanvas3D = dynamic(() => import("./hero-canvas-3d"), {
   ssr: false,
@@ -26,6 +28,7 @@ export function HeroExperience() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
+  const webglSupported = useWebGLSupport();
 
   useEffect(() => {
     setMounted(true);
@@ -78,13 +81,42 @@ export function HeroExperience() {
         />
 
         {/* 3D Canvas */}
-        {mounted && (
+        {mounted && webglSupported === false && (
           <div className="absolute inset-0">
-            <HeroCanvas3D
-              scrollProgress={scrollProgress}
-              mouseX={mouse.x}
-              mouseY={mouse.y}
-            />
+            <WebGLFallback>
+              <div className="mt-6 flex justify-center gap-4">
+                <Link
+                  href="/urunler"
+                  className="bg-gold-500 px-6 py-3 text-[12px] uppercase tracking-[0.2em] text-white transition-all hover:bg-gold-600"
+                >
+                  Koleksiyonu Keşfet
+                </Link>
+              </div>
+            </WebGLFallback>
+          </div>
+        )}
+        {mounted && webglSupported !== false && (
+          <div className="absolute inset-0">
+            <CanvasErrorBoundary
+              fallback={
+                <WebGLFallback>
+                  <div className="mt-6 flex justify-center gap-4">
+                    <Link
+                      href="/urunler"
+                      className="bg-gold-500 px-6 py-3 text-[12px] uppercase tracking-[0.2em] text-white transition-all hover:bg-gold-600"
+                    >
+                      Koleksiyonu Keşfet
+                    </Link>
+                  </div>
+                </WebGLFallback>
+              }
+            >
+              <HeroCanvas3D
+                scrollProgress={scrollProgress}
+                mouseX={mouse.x}
+                mouseY={mouse.y}
+              />
+            </CanvasErrorBoundary>
           </div>
         )}
 

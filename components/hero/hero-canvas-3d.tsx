@@ -162,6 +162,7 @@ function GoldParticles({ progressRef, mouseRef }: {
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const count = 80;
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
   const particles = useMemo(
@@ -252,7 +253,7 @@ export default function HeroCanvas3D({ scrollProgress, mouseX, mouseY }: ScenePr
       camera={{ position: [0, 1, 9], fov: 36 }}
       style={{ background: "transparent" }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-      dpr={[1, 1.5]}
+      dpr={[1, typeof window !== "undefined" && window.innerWidth < 768 ? 1 : 1.5]}
     >
       <Scene scrollProgress={scrollProgress} mouseX={mouseX} mouseY={mouseY} />
     </Canvas>

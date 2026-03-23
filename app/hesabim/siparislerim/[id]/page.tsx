@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect, notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/utils";
+import { CancelOrderButton } from "@/components/order/cancel-order-button";
 
 export default async function OrderDetailPage({
   params,
@@ -24,7 +25,7 @@ export default async function OrderDetailPage({
   return (
     <div>
       <h1 className="font-serif text-2xl font-semibold text-stone-900">
-        Siparis #{order.orderNumber}
+        Sipariş #{order.orderNumber}
       </h1>
 
       <div className="mt-4">
@@ -57,7 +58,7 @@ export default async function OrderDetailPage({
         </div>
         {Number(order.discountAmount) > 0 && (
           <div className="flex justify-between">
-            <span className="text-stone-500">Indirim</span>
+            <span className="text-stone-500">İndirim</span>
             <span className="text-green-600">
               -{formatPrice(Number(order.discountAmount))}
             </span>
@@ -77,6 +78,10 @@ export default async function OrderDetailPage({
             <p className="text-sm text-stone-500">{order.cargoCompany}</p>
           )}
         </div>
+      )}
+
+      {(order.status === "PENDING" || order.status === "PAID") && (
+        <CancelOrderButton orderId={order.id} />
       )}
     </div>
   );

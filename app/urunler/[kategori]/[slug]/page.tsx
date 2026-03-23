@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
-import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { ProductViewer3D } from "@/components/product/product-viewer-3d";
+import { VariantSelector } from "@/components/product/variant-selector";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -153,55 +153,29 @@ export default async function ProductDetailPage({
               {product.name}
             </h1>
 
-            {/* Price */}
-            <div className="mt-6 flex items-baseline gap-3">
-              <span className="font-serif text-2xl font-medium text-charcoal">
-                {formatPrice(Number(product.price))}
-              </span>
-              {hasDiscount && (
-                <span className="text-sm text-charcoal/30 line-through">
-                  {formatPrice(Number(product.compareAtPrice))}
-                </span>
-              )}
-            </div>
-
             {product.shortDescription && (
               <p className="mt-5 text-sm leading-[1.8] text-charcoal/50">
                 {product.shortDescription}
               </p>
             )}
 
-            {/* Variants */}
-            {product.variants.length > 0 && (
-              <div className="mt-8">
-                <h3 className="text-[11px] uppercase tracking-[0.2em] text-charcoal/60">
-                  Seçenekler
-                </h3>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {product.variants.map((variant) => (
-                    <button
-                      key={variant.id}
-                      className="border border-gold-200 px-4 py-2 text-[12px] uppercase tracking-[0.1em] text-charcoal/70 transition-all duration-300 hover:border-gold-500 hover:text-gold-700"
-                    >
-                      {variant.name}
-                      {Number(variant.priceModifier) > 0 &&
-                        ` (+${formatPrice(Number(variant.priceModifier))})`}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Add to cart */}
-            <div className="mt-8">
-              <AddToCartButton
-                productId={product.id}
-                name={product.name}
-                price={Number(product.price)}
-                image={primaryImage?.imageUrl}
-                slug={product.slug}
-              />
-            </div>
+            {/* Price + Variants + Add to cart (client component) */}
+            <VariantSelector
+              variants={product.variants.map((v) => ({
+                id: v.id,
+                name: v.name,
+                priceModifier: Number(v.priceModifier),
+              }))}
+              basePrice={Number(product.price)}
+              compareAtPrice={
+                product.compareAtPrice ? Number(product.compareAtPrice) : null
+              }
+              productId={product.id}
+              productName={product.name}
+              productImage={primaryImage?.imageUrl}
+              productSlug={product.slug}
+              categorySlug={product.category?.slug || ""}
+            />
 
             {/* Specs */}
             <div className="mt-10 space-y-0 border-t border-gold-100">

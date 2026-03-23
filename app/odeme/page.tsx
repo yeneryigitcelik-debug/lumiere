@@ -8,8 +8,12 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
 export default function CheckoutPage() {
-  const { items, totalPrice, clearCart } = useCartStore();
+  const { items, totalPrice } = useCartStore();
   const [loading, setLoading] = useState(false);
+  const [discountLoading, setDiscountLoading] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountError, setDiscountError] = useState("");
+  const [discountApplied, setDiscountApplied] = useState(false);
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -24,7 +28,33 @@ export default function CheckoutPage() {
 
   const subtotal = totalPrice();
   const shipping = subtotal >= 500 ? 0 : 29.9;
-  const total = subtotal + shipping;
+  const total = subtotal - discountAmount + shipping;
+
+  const handleApplyDiscount = async () => {
+    if (!form.discountCode.trim()) return;
+    setDiscountLoading(true);
+    setDiscountError("");
+    try {
+      const res = await fetch("/api/discount/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: form.discountCode, subtotal }),
+      });
+      const data = await res.json();
+      if (res.ok && data.valid) {
+        setDiscountAmount(data.discountAmount);
+        setDiscountApplied(true);
+      } else {
+        setDiscountError(data.error || "Geçersiz indirim kodu");
+        setDiscountAmount(0);
+        setDiscountApplied(false);
+      }
+    } catch {
+      setDiscountError("Bir hata oluştu");
+    } finally {
+      setDiscountLoading(false);
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -63,7 +93,6 @@ export default function CheckoutPage() {
       const data = await res.json();
 
       if (data.paymentPageUrl) {
-        clearCart();
         window.location.href = data.paymentPageUrl;
       } else {
         alert(data.error || "Ödeme başlatılamadı");
@@ -137,9 +166,36 @@ export default function CheckoutPage() {
                 İndirim Kodu
               </h2>
               <div className="mt-3 flex gap-2">
-                <Input name="discountCode" placeholder="Kupon kodu" value={form.discountCode} onChange={handleChange} />
-                <Button type="button" variant="outline">Uygula</Button>
+                <Input
+                  name="discountCode"
+                  placeholder="Kupon kodu"
+                  value={form.discountCode}
+                  onChange={(e) => {
+                    handleChange(e);
+                    if (discountApplied) {
+                      setDiscountApplied(false);
+                      setDiscountAmount(0);
+                    }
+                  }}
+                  disabled={discountApplied}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleApplyDiscount}
+                  disabled={discountLoading || discountApplied}
+                >
+                  {discountLoading ? "..." : discountApplied ? "Uygulandı" : "Uygula"}
+                </Button>
               </div>
+              {discountError && (
+                <p className="mt-1 text-[11px] text-red-500">{discountError}</p>
+              )}
+              {discountApplied && discountAmount > 0 && (
+                <p className="mt-1 text-[11px] text-green-600">
+                  {formatPrice(discountAmount)} indirim uygulandı
+                </p>
+              )}
             </div>
           </div>
 
@@ -170,6 +226,12 @@ export default function CheckoutPage() {
                   <span className="text-charcoal/40">Kargo</span>
                   <span>{shipping === 0 ? <span className="text-gold-600">Ücretsiz</span> : formatPrice(shipping)}</span>
                 </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-charcoal/40">İndirim</span>
+                    <span className="text-green-600">-{formatPrice(discountAmount)}</span>
+                  </div>
+                )}
               </div>
 
               <div className="mt-4 flex justify-between border-t border-gold-200/50 pt-4">

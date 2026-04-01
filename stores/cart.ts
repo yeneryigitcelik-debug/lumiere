@@ -78,7 +78,7 @@ export const useCartStore = create<CartState>()(
         ),
     }),
     {
-      name: "lumiere-cart",
+      name: "bycollection-cart",
     }
   )
 );

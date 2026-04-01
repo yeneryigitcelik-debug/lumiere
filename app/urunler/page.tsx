@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Koleksiyon",
-  description: "Lumiere & Co taki koleksiyonu. Kolyeler, yuzukler, bileklikler.",
+  description: "by collection takı koleksiyonu. Kolyeler, yüzükler, bileklikler.",
 };
 
 export default async function ProductsPage({

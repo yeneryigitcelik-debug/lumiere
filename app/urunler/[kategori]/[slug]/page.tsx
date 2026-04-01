@@ -105,7 +105,7 @@ export default async function ProductDetailPage({
                   <div className="text-center">
                     <span className="block font-serif text-6xl text-gold-200">&#9670;</span>
                     <span className="mt-3 block text-[10px] uppercase tracking-[0.2em] text-gold-300">
-                      Lumiere & Co
+                      by collection
                     </span>
                   </div>
                 </div>

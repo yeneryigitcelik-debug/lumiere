@@ -37,11 +37,11 @@ async function main() {
   // ═══ ADMİN KULLANICI ═══
   const adminPassword = await bcrypt.hash("admin123", 12);
   await prisma.user.upsert({
-    where: { email: "admin@lumiereand.com" },
+    where: { email: "admin@bycollection.com" },
     update: {},
     create: {
       name: "Admin",
-      email: "admin@lumiereand.com",
+      email: "admin@bycollection.com",
       hashedPassword: adminPassword,
       role: "ADMIN",
     },
@@ -71,8 +71,8 @@ async function main() {
       name: "Golden Serve Kolye",
       slug: "golden-serve-kolye",
       categoryId: catMap.kolyeler,
-      description: "Kapaklı Tenis Raketi Kolye – 925 Ayar Gümüş. Minimal tasarımı ve Lumière Mavisi zirkon taş detayıyla göz kamaştıran bu kolye, tenis tutkunları için özel olarak tasarlandı.",
-      shortDescription: "925 ayar gümüş, Lumière Mavisi zirkon taş detaylı",
+      description: "Kapaklı Tenis Raketi Kolye – 925 Ayar Gümüş. Minimal tasarımı ve Okyanus Mavisi zirkon taş detayıyla göz kamaştıran bu kolye, tenis tutkunları için özel olarak tasarlandı.",
+      shortDescription: "925 ayar gümüş, Okyanus Mavisi zirkon taş detaylı",
       price: 1700,
       sku: "LUM-KLY-002",
       stockQuantity: 10,
@@ -87,7 +87,7 @@ async function main() {
       name: "Tennis Racket Kolye",
       slug: "tennis-racket-kolye",
       categoryId: catMap.kolyeler,
-      description: "925 Ayar Gümüş Özel Tasarım Tenis Raketi Kolyesi! Tenis tutkunları için zarafet ve şıklığı bir araya getiren bu özel parça, her anınıza ışıltı katar.",
+      description: "925 Ayar Gümüş Özel Tasarım Tenis Raketi Kolyesi. Tenis tutkunları için zarafet ve şıklığı bir araya getiren bu özel parça, her anınıza ışıltı katar.",
       shortDescription: "925 ayar gümüş özel tasarım tenis raketi kolyesi",
       price: 1172,
       sku: "LUM-KLY-003",
@@ -135,10 +135,10 @@ async function main() {
       variants: [],
     },
     {
-      name: "Eyes of Lumière Kolye",
-      slug: "eyes-of-lumiere-kolye",
+      name: "Eyes of Collection Kolye",
+      slug: "eyes-of-collection-kolye",
       categoryId: catMap.kolyeler,
-      description: "Lumière imzalı göz motifli kolye. Ayarlanabilir zincir ile her boyuna uyum sağlar. Günlük ve özel günler için ideal.",
+      description: "by collection imzalı göz motifli kolye. Ayarlanabilir zincir ile her boyuna uyum sağlar. Günlük ve özel günler için ideal.",
       shortDescription: "Göz motifli, ayarlanabilir kolye",
       price: 480,
       sku: "LUM-KLY-006",
@@ -248,7 +248,7 @@ async function main() {
       images: [{ imageUrl: "/images/products/kupe-halka-ince.svg", isPrimary: true }],
       variants: [
         { name: "Pembe", variantType: "color", priceModifier: 0, stockQuantity: 8 },
-        { name: "Lumière Mavisi", variantType: "color", priceModifier: 0, stockQuantity: 8 },
+        { name: "Okyanus Mavisi", variantType: "color", priceModifier: 0, stockQuantity: 8 },
         { name: "Sarı", variantType: "color", priceModifier: 0, stockQuantity: 8 },
         { name: "Siyah", variantType: "color", priceModifier: 0, stockQuantity: 6 },
       ],
@@ -336,8 +336,8 @@ async function main() {
       variants: [],
     },
     {
-      name: "Eyes of Lumière Bileklik",
-      slug: "eyes-of-lumiere-bileklik",
+      name: "Eyes of Collection Bileklik",
+      slug: "eyes-of-collection-bileklik",
       categoryId: catMap.bileklikler,
       description: "Ayarlanabilir boyut, zirkon taş detaylı çelik bileklik. Altın kaplama ile kalıcı parlaklık.",
       shortDescription: "Zirkon taş detaylı, ayarlanabilir çelik bileklik",
@@ -418,10 +418,10 @@ async function main() {
       variants: [],
     },
     {
-      name: "Lumière Çiçek Yüzük",
-      slug: "lumiere-cicek-yuzuk",
+      name: "Collection Çiçek Yüzük",
+      slug: "collection-cicek-yuzuk",
       categoryId: catMap.yuzukler,
-      description: "Çiçek tasarımlı Lumière imzalı yüzük. Feminen ve zarif çizgileriyle dikkat çeker.",
+      description: "Çiçek tasarımlı by collection imzalı yüzük. Feminen ve zarif çizgileriyle dikkat çeker.",
       shortDescription: "Çiçek tasarımlı zarif yüzük",
       price: 440,
       sku: "LUM-YZK-004",
@@ -550,7 +550,7 @@ async function main() {
   });
   await prisma.discountCode.create({
     data: {
-      code: "LUMIERE50",
+      code: "BYCOL50",
       discountType: "FIXED",
       discountValue: 50,
       minOrderAmount: 300,

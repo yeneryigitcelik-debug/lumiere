@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState, useCallback, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment } from "@react-three/drei";
 import * as THREE from "three";
@@ -242,18 +242,38 @@ function Scene({ scrollProgress, mouseX, mouseY }: SceneProps) {
       <MainRing progressRef={progressRef} mouseRef={mouseRef} />
       <FloatingPieces progressRef={progressRef} />
       <GoldParticles progressRef={progressRef} mouseRef={mouseRef} />
-      <Environment preset="studio" environmentIntensity={0.9} />
+      <Suspense fallback={null}>
+        <Environment preset="studio" environmentIntensity={0.9} />
+      </Suspense>
     </>
   );
 }
 
 export default function HeroCanvas3D({ scrollProgress, mouseX, mouseY }: SceneProps) {
+  const [contextKey, setContextKey] = useState(0);
+  const retryTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const handleCreated = useCallback((state: { gl: THREE.WebGLRenderer }) => {
+    const canvas = state.gl.domElement;
+    canvas.addEventListener("webglcontextlost", () => {
+      // If context isn't restored within 2s, force re-create the Canvas
+      retryTimer.current = setTimeout(() => {
+        setContextKey((k) => k + 1);
+      }, 2000);
+    });
+    canvas.addEventListener("webglcontextrestored", () => {
+      if (retryTimer.current) clearTimeout(retryTimer.current);
+    });
+  }, []);
+
   return (
     <Canvas
+      key={contextKey}
       camera={{ position: [0, 1, 9], fov: 36 }}
       style={{ background: "transparent" }}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      gl={{ antialias: true, alpha: true, powerPreference: "default", failIfMajorPerformanceCaveat: false }}
       dpr={[1, typeof window !== "undefined" && window.innerWidth < 768 ? 1 : 1.5]}
+      onCreated={handleCreated}
     >
       <Scene scrollProgress={scrollProgress} mouseX={mouseX} mouseY={mouseY} />
     </Canvas>

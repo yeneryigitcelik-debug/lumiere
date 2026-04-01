@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Lumière & Co blog yazıları, takı bakım ipuçları ve daha fazlası.",
+  description: "by collection blog yazıları, takı bakım ipuçları ve daha fazlası.",
 };
 
 export default async function BlogPage() {

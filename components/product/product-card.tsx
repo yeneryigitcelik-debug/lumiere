@@ -47,7 +47,7 @@ export function ProductCard({
             <div className="text-center">
               <span className="block font-serif text-4xl text-gold-300">&#9670;</span>
               <span className="mt-2 block text-[10px] uppercase tracking-[0.2em] text-gold-300">
-                Lumiere
+                by collection
               </span>
             </div>
           </div>

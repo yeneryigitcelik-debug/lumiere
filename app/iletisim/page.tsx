@@ -61,11 +61,11 @@ export default function ContactPage() {
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-[0.15em] text-charcoal/40">E-posta</p>
-                <p className="mt-1 text-sm text-charcoal">info@lumiereand.com</p>
+                <p className="mt-1 text-sm text-charcoal">info@bycollection.com</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-[0.15em] text-charcoal/40">Sosyal Medya</p>
-                <p className="mt-1 text-sm text-charcoal">@lumiere.andco</p>
+                <p className="mt-1 text-sm text-charcoal">@bycollection</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-[0.15em] text-charcoal/40">Çalışma Saatleri</p>

@@ -105,37 +105,43 @@ export function SplashScreen() {
           style={{
             opacity: phase >= 1 ? 1 : 0,
             transform: `translateY(${phase >= 1 ? 0 : 15}px)`,
+            transition: "all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+          }}
+        >
+          <p className="text-[12px] font-light lowercase tracking-[0.6em] text-gold-500/70">
+            by
+          </p>
+        </div>
+
+        <div
+          className="mt-2 transition-all duration-[1000ms] ease-out"
+          style={{
+            opacity: phase >= 1 ? 1 : 0,
+            transform: `translateY(${phase >= 1 ? 0 : 15}px)`,
             letterSpacing: phase >= 2 ? "0.35em" : "0.15em",
             transition: "all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
           }}
         >
-          <h1 className="font-serif font-light text-white" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
-            LUMIÈRE
+          <h1 className="font-serif font-light text-white" style={{ fontSize: "clamp(1.8rem, 4.5vw, 3rem)" }}>
+            COLLECTION
           </h1>
         </div>
 
-        {/* & çizgisi */}
+        {/* Dekoratif çizgi */}
         <div
-          className="mt-3 flex items-center justify-center gap-4 transition-all duration-[1000ms]"
+          className="mt-4 flex items-center justify-center gap-4 transition-all duration-[1000ms]"
           style={{ opacity: phase >= 1 ? 1 : 0, transitionDelay: "200ms" }}
         >
           <div
             className="h-[0.5px] bg-gradient-to-r from-transparent to-gold-500/40 transition-all duration-[1500ms]"
-            style={{ width: phase >= 2 ? "40px" : "0px" }}
+            style={{ width: phase >= 2 ? "50px" : "0px" }}
           />
-          <span className="font-serif text-xl text-gold-500/70">&amp;</span>
+          <span className="font-serif text-xs text-gold-500/50">&#9670;</span>
           <div
             className="h-[0.5px] bg-gradient-to-l from-transparent to-gold-500/40 transition-all duration-[1500ms]"
-            style={{ width: phase >= 2 ? "40px" : "0px" }}
+            style={{ width: phase >= 2 ? "50px" : "0px" }}
           />
         </div>
-
-        <p
-          className="mt-1 text-[12px] font-light uppercase tracking-[0.6em] text-white/20 transition-all duration-[800ms]"
-          style={{ opacity: phase >= 1 ? 1 : 0, transitionDelay: "400ms" }}
-        >
-          Co
-        </p>
 
         {/* Slogan */}
         <div
@@ -144,7 +150,7 @@ export function SplashScreen() {
         >
           <div className="mx-auto mb-4 h-[0.5px] w-16 bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
           <p className="text-[9px] uppercase tracking-[0.5em] text-gold-400/50">
-            Işık &middot; Zarafet &middot; Benzersizlik
+            Zarafet &middot; Işık &middot; Koleksiyon
           </p>
         </div>
 

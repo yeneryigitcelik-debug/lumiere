@@ -120,9 +120,9 @@ export default async function HomePage() {
               Işık ve Zarafet
             </h2>
             <p className="mt-8 text-sm leading-[1.8] text-charcoal/50">
-              Fransızca&apos;da &quot;ışık&quot; ve &quot;parlaklık&quot; anlamına gelen Lumière &amp; Co,
-              benzersiz ve zarif takılarla lüks ve özel bir deneyim sunmayı amaçlar.
-              Her bir parçamız, usta zanaatkârların ellerinde özenle şekillendirilir.
+              by collection, benzersiz ve zarif takılarla lüks ve özel bir deneyim
+              sunmayı amaçlar. Her bir parçamız, usta zanaatkârların ellerinde özenle
+              şekillendirilir.
             </p>
             <p className="mt-4 text-sm leading-[1.8] text-charcoal/50">
               925 ayar gümüş, zirkon taş ve özel kaplama teknikleriyle üretilen
@@ -151,7 +151,7 @@ export default async function HomePage() {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
                 <span className="block font-serif text-[120px] leading-none text-gold-200/50">
-                  L
+                  bc
                 </span>
                 <div className="mt-4 h-[0.5px] w-20 mx-auto bg-gradient-to-r from-transparent via-gold-300 to-transparent" />
               </div>

@@ -23,7 +23,7 @@ export async function sendOrderConfirmation(params: {
     .join("");
 
   await getResend().emails.send({
-    from: "Lumiere & Co <siparis@lumiereand.com>",
+    from: "by collection <siparis@bycollection.com>",
     to: params.to,
     subject: `Siparis Onayi - ${params.orderNumber}`,
     html: `
@@ -45,8 +45,8 @@ export async function sendContactEmail(params: {
   message: string;
 }) {
   await getResend().emails.send({
-    from: "Lumiere & Co <iletisim@lumiereand.com>",
-    to: "info@lumiereand.com",
+    from: "by collection <iletisim@bycollection.com>",
+    to: "info@bycollection.com",
     subject: `Iletisim Formu - ${params.name}`,
     replyTo: params.email,
     html: `

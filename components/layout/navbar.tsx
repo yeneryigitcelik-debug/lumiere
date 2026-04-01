@@ -48,14 +48,11 @@ export function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="group relative">
-          <span className="font-serif text-2xl font-medium tracking-wide text-charcoal transition-colors duration-300 group-hover:text-gold-700">
-            LUMIERE
+          <span className="font-serif text-sm font-light lowercase tracking-[0.3em] text-gold-500 transition-colors duration-300 group-hover:text-gold-600">
+            by
           </span>
-          <span className="ml-1.5 font-serif text-lg font-light text-gold-500">
-            &
-          </span>
-          <span className="ml-1.5 font-serif text-sm font-light uppercase tracking-[0.3em] text-charcoal/60">
-            Co
+          <span className="ml-1.5 font-serif text-2xl font-medium tracking-wide text-charcoal transition-colors duration-300 group-hover:text-gold-700">
+            collection
           </span>
           <span className="absolute -bottom-1 left-0 h-[0.5px] w-0 bg-gradient-to-r from-gold-400 to-gold-200 transition-all duration-500 group-hover:w-full" />
         </Link>

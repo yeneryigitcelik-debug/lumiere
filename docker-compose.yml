@@ -3,8 +3,8 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: lumiere
-      POSTGRES_USER: lumiere
+      POSTGRES_DB: bycollection
+      POSTGRES_USER: bycollection
       POSTGRES_PASSWORD: localdev123
     ports:
       - "5432:5432"

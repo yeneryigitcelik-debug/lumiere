@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, Component, type ReactNode } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useWebGLSupport, WebGLFallback } from "@/components/three/webgl-detector";
@@ -14,6 +14,20 @@ const HeroCanvas3D = dynamic(() => import("./hero-canvas-3d"), {
     </div>
   ),
 });
+
+class Canvas3DErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
@@ -135,7 +149,7 @@ export function HeroExperience() {
                 transform: `translateY(${lerp(30, 0, phase1)}px)`,
               }}
             >
-              Lumière &amp; Co
+              by collection
             </p>
             <h1
               className="mt-4 font-serif font-medium leading-none"

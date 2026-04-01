@@ -21,8 +21,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Lumiere & Co | El Yapimi Taki Koleksiyonlari",
-    template: "%s | Lumiere & Co",
+    default: "by collection | El Yapımı Takı Koleksiyonları",
+    template: "%s | by collection",
   },
   description:
     "Benzersiz, el yapimi taki koleksiyonlari. Isik gibi parlayan kolyeler, yuzukler, bileklikler.",

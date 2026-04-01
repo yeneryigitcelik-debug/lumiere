@@ -8,17 +8,16 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="inline-block">
-              <span className="font-serif text-2xl font-medium tracking-wide text-white">
-                LUMIERE
+              <span className="font-serif text-sm font-light lowercase tracking-[0.3em] text-gold-400">
+                by
               </span>
-              <span className="ml-1 font-serif text-lg text-gold-400">&</span>
-              <span className="ml-1 font-serif text-sm uppercase tracking-[0.3em] text-white/50">
-                Co
+              <span className="ml-1 font-serif text-2xl font-medium tracking-wide text-white">
+                collection
               </span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/40">
-              Fransızca&apos;da &quot;ışık&quot; anlamına gelen Lumière, benzersiz ve zarif
-              takılarla lüks bir deneyim sunar.
+              Benzersiz ve zarif takılarla lüks bir deneyim sunan by collection,
+              her parçada ışık ve zarafeti bir araya getirir.
             </p>
             <div className="mt-6 h-[0.5px] w-12 bg-gradient-to-r from-gold-500 to-transparent" />
           </div>
@@ -80,9 +79,9 @@ export function Footer() {
             </h4>
             <div className="mt-5 space-y-3 text-sm text-white/40">
               <p>+90 531 961 42 54</p>
-              <p>info@lumiereand.com</p>
+              <p>info@bycollection.com</p>
               <p className="pt-2 text-[11px] text-white/25">
-                @lumiere.andco
+                @bycollection
               </p>
               <div className="pt-4">
                 <p className="text-[11px] uppercase tracking-[0.15em] text-white/25">
@@ -102,7 +101,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row">
           <p className="text-xs text-white/25">
-            &copy; {new Date().getFullYear()} Lumière &amp; Co. Tüm hakları saklıdır.
+            &copy; {new Date().getFullYear()} by collection. Tüm hakları saklıdır.
           </p>
           <div className="flex gap-6">
             <span className="text-xs text-white/25">

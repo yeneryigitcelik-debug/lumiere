@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Hakkimizda",
-  description: "Lumiere & Co hikayesi, vizyonu ve degerler.",
+  description: "by collection hikayesi, vizyonu ve değerler.",
 };
 
 export default function AboutPage() {
@@ -25,9 +25,9 @@ export default function AboutPage() {
       <section className="mx-auto max-w-3xl px-6 py-24">
         <div className="space-y-8 text-sm leading-[2] text-charcoal/50">
           <p>
-            Lumiere & Co, isik ve zarafeti bir araya getiren el yapimi taki
-            koleksiyonlari ile 2024 yilinda kurulmustur. Her bir parcamiz, usta
-            zanaatkarlarin ellerinde ozenle sekillendirilmistir.
+            by collection, ışık ve zarafeti bir araya getiren el yapımı takı
+            koleksiyonları ile 2024 yılında kurulmuştur. Her bir parçamız, usta
+            zanaatkârların ellerinde özenle şekillendirilmiştir.
           </p>
           <p>
             Markamizin temelinde, benzersizlik ve kalite anlayisi yatmaktadir.

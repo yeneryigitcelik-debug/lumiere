@@ -80,5 +80,5 @@
   <circle cx="355" cy="255" r="1.5" fill="#c6994a" opacity="0.2"/>
 
   <!-- Brand text -->
-  <text x="300" y="740" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="8" fill="#c6994a" opacity="0.08" font-variant="small-caps">LUMIERE</text>
+  <text x="300" y="740" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="8" fill="#c6994a" opacity="0.08" font-variant="small-caps">BY COLLECTION</text>
 </svg>

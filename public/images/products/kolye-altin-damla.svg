@@ -71,5 +71,5 @@
   <ellipse cx="290" cy="350" rx="20" ry="40" fill="#f0e4c4" opacity="0.15"/>
 
   <!-- Brand text -->
-  <text x="300" y="740" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="8" fill="#c6994a" opacity="0.08" font-variant="small-caps">LUMIERE</text>
+  <text x="300" y="740" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="8" fill="#c6994a" opacity="0.08" font-variant="small-caps">BY COLLECTION</text>
 </svg>

@@ -11,7 +11,7 @@ Interaction thesis: A useful static first view and reduced-motion/WebGL fallback
 - [x] Fable source + actual synthetic before-PNG audit.
 - [x] Opus focused authoring of reproduced public UI fixes.
 - [x] Meaningful pure/browser checks, safe dependency fixes and isolated build/type/lint.
-- [ ] Independent Fable final code + actual PNG review and revisions.
+- [x] Independent Fable final code + actual PNG review and revisions.
 - [x] Draft PR, attached evidence and clean primary preservation receipt; no merge/deploy.
 
 Live-domain note: repository identity is verified; a current independently verified public production domain has not been established. This local draft does not claim a live deployment.

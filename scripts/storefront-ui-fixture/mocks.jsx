@@ -1,0 +1,23 @@
+/* Next-specific props are intentionally consumed by this synthetic HTML adapter. */
+/* eslint-disable @typescript-eslint/no-unused-vars, @next/next/no-img-element */
+import React,{useSyncExternalStore} from "react";
+export function Link({children,onClick,onNavigate,prefetch,replace,scroll,...props}){return <a {...props} onClick={e=>{onClick?.(e);if(!e.defaultPrevented&&!e.metaKey&&!e.ctrlKey&&!e.shiftKey&&!e.altKey&&e.button===0){e.preventDefault();onNavigate?.({preventDefault:()=>e.preventDefault()});history.pushState({},"",props.href);window.dispatchEvent(new PopStateEvent("popstate"));}}}>{children}</a>}
+export const Image=React.forwardRef(function Image({fill,quality,priority,unoptimized,style,...props},ref){return <img ref={ref} alt="" {...props} style={{...(fill?{position:"absolute",inset:0,width:"100%",height:"100%"}:{}),...style}}/>});
+export function usePathname(){return useSyncExternalStore(cb=>{window.addEventListener("popstate",cb);return()=>window.removeEventListener("popstate",cb)},()=>location.pathname,()=>"/")}
+export function useRouter(){return {push(url){(window.__routerCalls??=[]).push({method:"push",url});history.pushState({},"",url);window.dispatchEvent(new PopStateEvent("popstate"))},replace(url){(window.__routerCalls??=[]).push({method:"replace",url});history.replaceState({},"",url);window.dispatchEvent(new PopStateEvent("popstate"))},refresh(){(window.__routerCalls??=[]).push({method:"refresh"})}}}
+export async function signIn(provider,options){window.__auth.calls.push({provider,options});if(window.__auth.mode==='reject')throw new Error('synthetic provider error');if(window.__auth.mode==='undefined')return undefined;if(window.__auth.mode==='pending')return new Promise((resolve,reject)=>{window.__auth.pending.push(resolve);window.__auth.rejections.push(reject)});return{ok:false,status:401,error:'CredentialsSignin',url:null}}
+export default function dynamic(){return function GraphicsDisabled(){return <div data-fixture-graphics="disabled"/>}}
+
+export function useSession(){
+  const snapshot=useSyncExternalStore(
+    cb=>{window.addEventListener('fixture:session',cb);return()=>window.removeEventListener('fixture:session',cb)},
+    ()=>window.__session,
+    ()=>({data:null,status:'loading'})
+  );
+  return {...snapshot,update:async patch=>{
+    window.__sessionUpdates.push(patch);
+    window.__session={...window.__session,data:{...window.__session.data,user:{...window.__session.data?.user,...patch}}};
+    window.dispatchEvent(new Event('fixture:session'));
+    return window.__session.data;
+  }};
+}

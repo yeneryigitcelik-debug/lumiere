@@ -4,6 +4,7 @@ import { useRef, useMemo, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Float } from "@react-three/drei";
 import * as THREE from "three";
+import { visualRandom } from "@/lib/visual-random";
 
 // ═══ Mouse tracker - tüm sahne mouse'a tepki verir ═══
 function MouseTracker({ children }: { children: React.ReactNode }) {
@@ -193,15 +194,15 @@ function GoldDust() {
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
   const particles = useMemo(() => {
-    return Array.from({ length: count }, () => ({
+    return Array.from({ length: count }, (_, i) => ({
       position: new THREE.Vector3(
-        (Math.random() - 0.5) * 12,
-        (Math.random() - 0.5) * 8,
-        (Math.random() - 0.5) * 6
+        (visualRandom(i, 0) - 0.5) * 12,
+        (visualRandom(i, 1) - 0.5) * 8,
+        (visualRandom(i, 2) - 0.5) * 6
       ),
-      speed: 0.2 + Math.random() * 0.5,
-      offset: Math.random() * Math.PI * 2,
-      scale: 0.01 + Math.random() * 0.025,
+      speed: 0.2 + visualRandom(i, 3) * 0.5,
+      offset: visualRandom(i, 4) * Math.PI * 2,
+      scale: 0.01 + visualRandom(i, 5) * 0.025,
     }));
   }, [count]);
 

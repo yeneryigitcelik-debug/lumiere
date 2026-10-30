@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { formatPrice } from "@/lib/utils";
 import { ProductViewer3D } from "@/components/product/product-viewer-3d";
 import { VariantSelector } from "@/components/product/variant-selector";
 import type { Metadata } from "next";
@@ -50,6 +49,13 @@ export default async function ProductDetailPage({
   const hasDiscount =
     product.compareAtPrice &&
     Number(product.compareAtPrice) > Number(product.price);
+
+  const specs = [
+    { label: "Malzeme", value: product.material },
+    { label: "Agirlik", value: product.weight },
+    { label: "Boyutlar", value: product.dimensions },
+    { label: "SKU", value: product.sku },
+  ].filter((spec) => spec.value);
 
   return (
     <div className="pt-24">
@@ -178,15 +184,9 @@ export default async function ProductDetailPage({
             />
 
             {/* Specs */}
-            <div className="mt-10 space-y-0 border-t border-gold-100">
-              {[
-                { label: "Malzeme", value: product.material },
-                { label: "Agirlik", value: product.weight },
-                { label: "Boyutlar", value: product.dimensions },
-                { label: "SKU", value: product.sku },
-              ]
-                .filter((spec) => spec.value)
-                .map((spec) => (
+            {specs.length > 0 && (
+              <div className="mt-10 space-y-0 border-t border-gold-100">
+                {specs.map((spec) => (
                   <div
                     key={spec.label}
                     className="flex justify-between border-b border-gold-100/50 py-3.5 text-sm"
@@ -197,7 +197,8 @@ export default async function ProductDetailPage({
                     <span className="text-charcoal/70">{spec.value}</span>
                   </div>
                 ))}
-            </div>
+              </div>
+            )}
 
             {/* Description */}
             {product.description && (

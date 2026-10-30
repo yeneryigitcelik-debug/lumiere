@@ -1,38 +1,140 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+type Pending = null | "credentials" | "google";
+
+const SLOW_AFTER_MS = 20000;
+const MSG_INVALID = "E-posta veya şifre hatalı";
+const MSG_GENERIC = "Giriş şu anda tamamlanamadı. Lütfen biraz sonra tekrar deneyin.";
+const MSG_NETWORK = "Bağlantı sorunu nedeniyle giriş tamamlanamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.";
+const MSG_GOOGLE = "Google ile giriş başlatılamadı. Lütfen tekrar deneyin.";
+
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState<Pending>(null);
+  const [slow, setSlow] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  const inFlightRef = useRef(false);
+  const mountedRef = useRef(true);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = null;
+    };
+  }, []);
 
-    if (result?.error) {
-      setError("E-posta veya şifre hatalı");
-    } else {
-      window.location.href = "/";
-    }
-    setLoading(false);
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
+
+  const clearTimer = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = null;
   };
 
+  const lock = (kind: Exclude<Pending, null>) => {
+    inFlightRef.current = true;
+    setPending(kind);
+    setSlow(false);
+    setError("");
+    clearTimer();
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      if (mountedRef.current) setSlow(true);
+    }, SLOW_AFTER_MS);
+  };
+
+  const unlockWithError = (message: string) => {
+    clearTimer();
+    inFlightRef.current = false;
+    if (!mountedRef.current) return;
+    setPending(null);
+    setSlow(false);
+    setError(message);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (inFlightRef.current) return;
+    lock("credentials");
+
+    let result: Awaited<ReturnType<typeof signIn>> | undefined;
+    try {
+      result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+    } catch {
+      unlockWithError(MSG_NETWORK);
+      return;
+    }
+
+    // Page was left (e.g. user navigated to /kayit) while pending: never navigate.
+    if (!mountedRef.current) {
+      clearTimer();
+      inFlightRef.current = false;
+      return;
+    }
+
+    if (result?.ok === true && !result.error) {
+      clearTimer();
+      // Keep the form locked (inFlightRef/pending stay set) until navigation unmounts this page.
+      router.push("/");
+      router.refresh();
+      return;
+    }
+
+    const invalid =
+      result?.error === "CredentialsSignin" || result?.status === 401;
+    unlockWithError(invalid ? MSG_INVALID : MSG_GENERIC);
+  };
+
+  const handleGoogle = async () => {
+    if (inFlightRef.current) return;
+    lock("google");
+    try {
+      // Default redirect: an undefined/resolved result means navigation is underway.
+      await signIn("google", { callbackUrl: "/" });
+    } catch {
+      if (!mountedRef.current) {
+        clearTimer();
+        inFlightRef.current = false;
+        return;
+      }
+      unlockWithError(MSG_GOOGLE);
+      return;
+    }
+    if (!mountedRef.current) {
+      clearTimer();
+      inFlightRef.current = false;
+    }
+  };
+
+  const isPending = pending !== null;
+  const statusText =
+    pending === "credentials"
+      ? "Giriş yapılıyor, lütfen bekleyin."
+      : pending === "google"
+        ? "Google girişine yönlendiriliyorsunuz."
+        : "";
+
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-6 pt-24">
+    <div className="flex min-h-[80vh] items-center justify-center px-6 pt-24 pb-12">
       <div className="w-full max-w-md">
         <div className="text-center">
           <p className="text-[11px] uppercase tracking-[0.3em] text-gold-500">
@@ -43,69 +145,127 @@ export default function LoginPage() {
           </h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-10 space-y-5">
+        <form
+          onSubmit={handleSubmit}
+          className="mt-10 space-y-5"
+          aria-busy={isPending}
+          noValidate={false}
+        >
           {error && (
-            <p className="border border-red-200 bg-red-50 px-4 py-3 text-[12px] text-red-600">
+            <p
+              id="login-error"
+              ref={errorRef}
+              role="alert"
+              tabIndex={-1}
+              className="border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700 focus:outline-2 focus:outline-offset-2 focus:outline-red-600"
+            >
               {error}
             </p>
           )}
 
           <div>
-            <label className="text-[11px] uppercase tracking-[0.15em] text-charcoal/60">
+            <label
+              htmlFor="login-email"
+              className="text-[11px] uppercase tracking-[0.15em] text-charcoal/70"
+            >
               E-posta
             </label>
             <Input
+              id="login-email"
+              name="email"
               type="email"
+              autoComplete="email"
+              inputMode="email"
+              autoCapitalize="none"
+              spellCheck={false}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              readOnly={isPending}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "login-error" : undefined}
               required
-              className="mt-1.5"
+              className="mt-1.5 h-12 text-base read-only:bg-gold-50/40"
             />
           </div>
 
           <div>
-            <label className="text-[11px] uppercase tracking-[0.15em] text-charcoal/60">
+            <label
+              htmlFor="login-password"
+              className="text-[11px] uppercase tracking-[0.15em] text-charcoal/70"
+            >
               Şifre
             </label>
             <Input
+              id="login-password"
+              name="password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              readOnly={isPending}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "login-error" : undefined}
               required
-              className="mt-1.5"
+              className="mt-1.5 h-12 text-base read-only:bg-gold-50/40"
             />
           </div>
 
-          <Button type="submit" className="w-full" size="lg" disabled={loading}>
-            {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
+          <Button
+            type="submit"
+            className="min-h-12 w-full motion-reduce:transition-none"
+            size="lg"
+            disabled={isPending}
+          >
+            {pending === "credentials" ? "Giriş yapılıyor..." : "Giriş Yap"}
           </Button>
+
+          <p role="status" aria-live="polite" className="text-center text-[13px] text-charcoal/70">
+            {statusText}
+            {slow && isPending && (
+              <span className="mt-2 block">
+                İşlem beklenenden uzun sürüyor. Bağlantınız yavaş olabilir; dilerseniz{" "}
+                <a
+                  href="/giris"
+                  className="inline-flex min-h-11 items-center text-gold-700 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-500"
+                >
+                  sayfayı yenileyin
+                </a>
+                .
+              </span>
+            )}
+          </p>
         </form>
 
         <div className="mt-8">
           <div className="relative">
-            <div className="absolute inset-0 flex items-center">
+            <div className="absolute inset-0 flex items-center" aria-hidden="true">
               <div className="w-full border-t border-gold-100" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-cream px-4 text-[11px] uppercase tracking-[0.15em] text-charcoal/30">
+              <span className="bg-cream px-4 text-[11px] uppercase tracking-[0.15em] text-charcoal/60">
                 veya
               </span>
             </div>
           </div>
 
           <Button
+            type="button"
             variant="outline"
-            className="mt-5 w-full"
+            className="mt-5 min-h-12 w-full text-charcoal/80 motion-reduce:transition-none"
             size="lg"
-            onClick={() => signIn("google", { callbackUrl: "/" })}
+            disabled={isPending}
+            onClick={handleGoogle}
           >
-            Google ile Giriş Yap
+            {pending === "google" ? "Google açılıyor..." : "Google ile Giriş Yap"}
           </Button>
         </div>
 
-        <p className="mt-8 text-center text-[12px] text-charcoal/40">
+        <p className="mt-8 text-center text-[13px] text-charcoal/70">
           Hesabınız yok mu?{" "}
-          <Link href="/kayit" className="text-gold-600 transition-colors hover:text-gold-700">
+          <Link
+            href="/kayit"
+            className="inline-flex min-h-11 items-center px-1 text-gold-700 transition-colors hover:text-gold-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-500 motion-reduce:transition-none"
+          >
             Kayıt Ol
           </Link>
         </p>

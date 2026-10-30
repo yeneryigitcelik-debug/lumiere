@@ -31,14 +31,19 @@ export function VariantSelector({
   productSlug,
   categorySlug,
 }: VariantSelectorProps) {
-  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+  // Store only ids; resolve against current props so stale/removed variants never reach the cart.
+  const [selection, setSelection] = useState<{ productId: string; variantId: string } | null>(null);
+  const selectedVariant =
+    selection && selection.productId === productId
+      ? variants.find((v) => v.id === selection.variantId) ?? null
+      : null;
   const currentPrice = basePrice + (selectedVariant ? selectedVariant.priceModifier : 0);
   const hasDiscount = compareAtPrice && compareAtPrice > basePrice;
 
   return (
     <>
       {/* Price */}
-      <div className="mt-6 flex items-baseline gap-3">
+      <div className="mt-6 flex items-baseline gap-3" aria-live="polite" aria-atomic="true">
         <span className="font-serif text-2xl font-medium text-charcoal">
           {formatPrice(currentPrice)}
         </span>
@@ -51,30 +56,38 @@ export function VariantSelector({
 
       {/* Variants */}
       {variants.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-[11px] uppercase tracking-[0.2em] text-charcoal/60">
+        <div className="mt-8" role="group" aria-labelledby={`variants-${productId}`}>
+          <h3
+            id={`variants-${productId}`}
+            className="text-[11px] uppercase tracking-[0.2em] text-charcoal/60"
+          >
             Seçenekler
           </h3>
           <div className="mt-3 flex flex-wrap gap-2">
-            {variants.map((variant) => (
-              <button
-                key={variant.id}
-                onClick={() =>
-                  setSelectedVariant(
-                    selectedVariant?.id === variant.id ? null : variant
-                  )
-                }
-                className={`border px-4 py-2 text-[12px] uppercase tracking-[0.1em] transition-all duration-300 ${
-                  selectedVariant?.id === variant.id
-                    ? "border-gold-500 bg-gold-50 text-gold-700"
-                    : "border-gold-200 text-charcoal/70 hover:border-gold-500 hover:text-gold-700"
-                }`}
-              >
-                {variant.name}
-                {variant.priceModifier > 0 &&
-                  ` (+${formatPrice(variant.priceModifier)})`}
-              </button>
-            ))}
+            {variants.map((variant) => {
+              const isSelected = selectedVariant?.id === variant.id;
+              return (
+                <button
+                  key={variant.id}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() =>
+                    setSelection(
+                      isSelected ? null : { productId, variantId: variant.id }
+                    )
+                  }
+                  className={`min-h-[44px] border px-4 py-2 text-[12px] uppercase tracking-[0.1em] transition-colors duration-300 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-600 ${
+                    isSelected
+                      ? "border-gold-500 bg-gold-50 text-gold-700"
+                      : "border-gold-200 text-charcoal/70 hover:border-gold-500 hover:text-gold-700"
+                  }`}
+                >
+                  {variant.name}
+                  {variant.priceModifier > 0 &&
+                    ` (+${formatPrice(variant.priceModifier)})`}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

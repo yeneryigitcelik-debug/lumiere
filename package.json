@@ -13,7 +13,7 @@
     "prisma:generate": "npx prisma generate",
     "test": "node --import tsx --test tests/*.test.mjs",
     "test:browser": "playwright test",
-    "lint:storefront": "eslint \"app/(auth)/giris/page.tsx\" app/sepet/page.tsx components/cart/add-to-cart-button.tsx components/hero/hero-experience.tsx components/layout/navbar.tsx components/layout/splash-screen.tsx components/product/product-viewer-3d.tsx components/product/variant-selector.tsx components/three/model-viewer.tsx components/three/webgl-detector.tsx stores/cart.ts tests scripts/storefront-ui-fixture playwright.config.mjs"
+    "lint:storefront": "eslint \"app/(auth)/giris/page.tsx\" app/sepet/page.tsx components/cart/add-to-cart-button.tsx components/hero/hero-experience.tsx components/layout/navbar.tsx components/layout/splash-screen.tsx components/product/product-viewer-3d.tsx components/product/variant-selector.tsx components/three/model-viewer.tsx components/three/webgl-detector.tsx stores/cart.ts tests scripts/storefront-ui-fixture playwright.config.mjs \"app/urunler/[kategori]/[slug]/page.tsx\" app/hesabim/page.tsx app/admin/kategoriler/page.tsx components/hero/hero-canvas-3d.tsx components/three/hero-canvas.tsx lib/visual-random.ts"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

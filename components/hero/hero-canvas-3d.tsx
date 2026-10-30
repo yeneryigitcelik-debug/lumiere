@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useMemo, useState, useCallback, Suspense } from "react";
+import { useRef, useMemo, useState, useCallback, useEffect, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment } from "@react-three/drei";
 import * as THREE from "three";
+import { visualRandom } from "@/lib/visual-random";
 
 interface SceneProps {
   scrollProgress: number;
@@ -162,20 +163,19 @@ function GoldParticles({ progressRef, mouseRef }: {
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const count = 80;
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
   const particles = useMemo(
     () =>
-      Array.from({ length: count }, () => ({
+      Array.from({ length: count }, (_, i) => ({
         pos: new THREE.Vector3(
-          (Math.random() - 0.5) * 14,
-          (Math.random() - 0.5) * 10,
-          (Math.random() - 0.5) * 8 - 2
+          (visualRandom(i, 0) - 0.5) * 14,
+          (visualRandom(i, 1) - 0.5) * 10,
+          (visualRandom(i, 2) - 0.5) * 8 - 2
         ),
-        speed: 0.15 + Math.random() * 0.4,
-        offset: Math.random() * Math.PI * 2,
-        size: 0.008 + Math.random() * 0.02,
+        speed: 0.15 + visualRandom(i, 3) * 0.4,
+        offset: visualRandom(i, 4) * Math.PI * 2,
+        size: 0.008 + visualRandom(i, 5) * 0.02,
       })),
     []
   );
@@ -219,8 +219,11 @@ function GoldParticles({ progressRef, mouseRef }: {
 function Scene({ scrollProgress, mouseX, mouseY }: SceneProps) {
   const progressRef = useRef(scrollProgress);
   const mouseRef = useRef({ x: mouseX, y: mouseY });
-  progressRef.current = scrollProgress;
-  mouseRef.current = { x: mouseX, y: mouseY };
+
+  useEffect(() => {
+    progressRef.current = scrollProgress;
+    mouseRef.current = { x: mouseX, y: mouseY };
+  }, [scrollProgress, mouseX, mouseY]);
 
   useFrame((state) => {
     const cam = state.camera;

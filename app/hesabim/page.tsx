@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -17,14 +18,10 @@ export default function ProfilePage() {
     if (status === "unauthenticated") router.push("/giris");
   }, [status, router]);
 
-  useEffect(() => {
-    if (session?.user) {
-      setForm({
-        name: session.user.name || "",
-        phone: "",
-      });
-    }
-  }, [session]);
+  const startEditing = () => {
+    setForm({ name: session?.user?.name || "", phone: "" });
+    setEditing(true);
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -65,16 +62,23 @@ export default function ProfilePage() {
             <div className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-charcoal/40">Ad</p>
+                  <label htmlFor="profile-name" className="block text-[10px] uppercase tracking-[0.2em] text-charcoal/40">Ad</label>
                   <Input
+                    id="profile-name"
+                    name="name"
+                    autoComplete="name"
                     value={form.name}
                     onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                     className="mt-1"
                   />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-charcoal/40">Telefon</p>
+                  <label htmlFor="profile-phone" className="block text-[10px] uppercase tracking-[0.2em] text-charcoal/40">Telefon</label>
                   <Input
+                    id="profile-phone"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
                     value={form.phone}
                     onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
                     placeholder="05XX XXX XX XX"
@@ -104,7 +108,7 @@ export default function ProfilePage() {
                 </div>
               </div>
               <button
-                onClick={() => setEditing(true)}
+                onClick={startEditing}
                 className="mt-4 text-[11px] uppercase tracking-[0.15em] text-gold-600 hover:text-gold-700"
               >
                 Düzenle
@@ -114,14 +118,14 @@ export default function ProfilePage() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <a href="/hesabim/siparislerim" className="group border border-gold-100 p-5 transition-all hover:border-gold-300 hover:bg-gold-50/30">
+          <Link href="/hesabim/siparislerim" className="group border border-gold-100 p-5 transition-all hover:border-gold-300 hover:bg-gold-50/30">
             <p className="text-[11px] uppercase tracking-[0.15em] text-gold-500">Siparişlerim</p>
             <p className="mt-1 text-sm text-charcoal/50">Sipariş geçmişinizi görüntüleyin</p>
-          </a>
-          <a href="/hesabim/adreslerim" className="group border border-gold-100 p-5 transition-all hover:border-gold-300 hover:bg-gold-50/30">
+          </Link>
+          <Link href="/hesabim/adreslerim" className="group border border-gold-100 p-5 transition-all hover:border-gold-300 hover:bg-gold-50/30">
             <p className="text-[11px] uppercase tracking-[0.15em] text-gold-500">Adreslerim</p>
             <p className="mt-1 text-sm text-charcoal/50">Kayıtlı adreslerinizi yönetin</p>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

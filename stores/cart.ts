@@ -181,7 +181,12 @@ const safeStorage: PersistStorage<PersistedCart> = {
       addPendingWarning(CART_WARNING_WRITE);
       return memory.get(name) ?? null;
     }
-    if (raw === null) return null;
+    if (raw === null) {
+      // Successful read with no saved cart: the stored cart is explicitly empty.
+      // Drop the memory copy so a later failed read cannot resurrect it.
+      memory.delete(name);
+      return { state: { items: [] }, version: CART_STORAGE_VERSION };
+    }
     try {
       const parsed: unknown = JSON.parse(raw);
       if (!isRecord(parsed)) {

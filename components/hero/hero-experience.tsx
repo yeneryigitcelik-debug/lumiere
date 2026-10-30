@@ -42,44 +42,60 @@ function Diamond({ className = "" }: { className?: string }) {
   );
 }
 
+/** Shared intro: identical geometry/content for static fallback and enhanced phase 1 at scroll 0. */
+function HeroIntro({ dark = false }: { dark?: boolean }) {
+  return (
+    <div className="mx-auto flex min-h-[calc(100svh-72px)] max-w-7xl flex-col items-center justify-center px-6 py-10 text-center">
+      <Diamond className="mx-auto mb-5" />
+      <p
+        className={`text-[11px] lowercase tracking-[0.5em] transition-colors ${dark ? "" : "text-gold-600"}`}
+        style={dark ? { color: "rgba(212,181,116,0.9)" } : undefined}
+      >
+        by collection
+      </p>
+      <h1
+        id="hero-title"
+        className={`mt-3 font-serif font-medium leading-none transition-colors ${dark ? "" : "text-charcoal"}`}
+        style={{ fontSize: "clamp(2.5rem, 8vw, 7rem)", ...(dark ? { color: "rgba(255,255,255,0.95)" } : {}) }}
+      >
+        Işığı Keşfet
+      </h1>
+      <div aria-hidden="true" className="mx-auto mt-4 h-px w-28 bg-gradient-to-r from-transparent via-gold-500 to-transparent" />
+      <p className={`mt-5 max-w-md text-sm leading-relaxed transition-colors ${dark ? "text-white/70" : "text-charcoal/70"}`}>
+        925 ayar gümüş ve zirkon taşlarla, usta zanaatkârların ellerinde şekillenen benzersiz tasarımlar.
+      </p>
+      <div className="mt-7 flex flex-wrap justify-center gap-3">
+        <Link href="/urunler" className={primaryCta}>
+          Koleksiyonu Keşfet <span aria-hidden="true">&rarr;</span>
+        </Link>
+        <Link
+          href="/hakkimizda"
+          className={`inline-flex min-h-11 items-center justify-center border px-7 py-3 text-[12px] uppercase tracking-[0.2em] transition-colors ${
+            dark
+              ? "border-white/30 text-white/85 hover:border-gold-300 hover:text-gold-300"
+              : "border-charcoal/20 text-charcoal/80 hover:border-gold-600 hover:text-gold-700"
+          }`}
+        >
+          Hikâyemiz
+        </Link>
+      </div>
+      <ul className="mt-8 hidden justify-center gap-10 sm:flex">
+        {STATS.map((s) => (
+          <li key={s.label}>
+            <p className={`font-serif text-xl font-medium ${dark ? "text-gold-300" : "text-gold-600"}`}>{s.value}</p>
+            <p className={`mt-0.5 text-[10px] uppercase tracking-[0.15em] ${dark ? "text-white/60" : "text-charcoal/60"}`}>{s.label}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 /** SSR / no-JS / reduced-motion / mobile / no-WebGL composition: one screen. */
 function StaticHero() {
   return (
     <section aria-labelledby="hero-title" className="hero-public relative overflow-hidden bg-cream">
-      <div className="mx-auto flex min-h-[calc(100svh-72px)] max-w-7xl flex-col items-center justify-center px-6 py-10 text-center">
-        <Diamond className="mx-auto mb-5" />
-        <p className="text-[11px] lowercase tracking-[0.5em] text-gold-600">by collection</p>
-        <h1
-          id="hero-title"
-          className="mt-3 font-serif font-medium leading-none text-charcoal"
-          style={{ fontSize: "clamp(2.5rem, 8vw, 7rem)" }}
-        >
-          Işığı Keşfet
-        </h1>
-        <div aria-hidden="true" className="mx-auto mt-4 h-px w-28 bg-gradient-to-r from-transparent via-gold-500 to-transparent" />
-        <p className="mt-5 max-w-md text-sm leading-relaxed text-charcoal/70">
-          925 ayar gümüş ve zirkon taşlarla, usta zanaatkârların ellerinde şekillenen benzersiz tasarımlar.
-        </p>
-        <div className="mt-7 flex flex-wrap justify-center gap-3">
-          <Link href="/urunler" className={primaryCta}>
-            Koleksiyonu Keşfet <span aria-hidden="true">&rarr;</span>
-          </Link>
-          <Link
-            href="/hakkimizda"
-            className="inline-flex min-h-11 items-center justify-center border border-charcoal/20 px-7 py-3 text-[12px] uppercase tracking-[0.2em] text-charcoal/80 transition-colors hover:border-gold-600 hover:text-gold-700"
-          >
-            Hikâyemiz
-          </Link>
-        </div>
-        <ul className="mt-8 hidden justify-center gap-10 sm:flex">
-          {STATS.map((s) => (
-            <li key={s.label}>
-              <p className="font-serif text-xl font-medium text-gold-600">{s.value}</p>
-              <p className="mt-0.5 text-[10px] uppercase tracking-[0.15em] text-charcoal/60">{s.label}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <HeroIntro />
     </section>
   );
 }
@@ -186,36 +202,12 @@ export function HeroExperience() {
 
         {/* Faz 1: Açılış */}
         <div
-          className="absolute inset-0 z-10 flex items-center justify-center pt-[72px]"
+          className="absolute inset-x-0 top-0 z-10"
           style={{ opacity: o1, pointerEvents: live(o1) ? "auto" : "none" }}
           aria-hidden={!live(o1) || undefined}
           inert={!live(o1)}
         >
-          <div className="text-center">
-            <p
-              className="text-[11px] lowercase tracking-[0.5em]"
-              style={{ color: dark ? "rgba(212,181,116,0.9)" : "#9a6b24" }}
-            >
-              by collection
-            </p>
-            <h1
-              id="hero-title"
-              className="mt-4 font-serif font-medium leading-none"
-              style={{
-                fontSize: "clamp(3rem, 8vw, 10rem)",
-                color: dark ? "rgba(255,255,255,0.95)" : "rgba(26,26,26,0.92)",
-                letterSpacing: `${lerp(0.02, 0.04, phase1)}em`,
-              }}
-            >
-              Işığı Keşfet
-            </h1>
-            <div aria-hidden="true" className="mx-auto mt-4 h-px w-28 bg-gradient-to-r from-transparent via-gold-500 to-transparent" />
-            <div className="mt-8 flex justify-center">
-              <Link href="/urunler" className={primaryCta}>
-                Koleksiyonu Keşfet <span aria-hidden="true">&rarr;</span>
-              </Link>
-            </div>
-          </div>
+          <HeroIntro dark={dark} />
         </div>
 
         {/* Faz 2: Vitrin */}

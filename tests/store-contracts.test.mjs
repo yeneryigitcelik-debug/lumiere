@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { transformSync } from 'esbuild';
 const require = createRequire(import.meta.url);
-const cartCode = transformSync(readFileSync(new URL('../stores/cart.ts', import.meta.url), 'utf8'), { loader: 'ts', format: 'cjs', target: 'node24' }).code;
+const cartCode = transformSync(readFileSync(new URL('../stores/cart.ts', import.meta.url), 'utf8'), { loader: 'ts', format: 'cjs', target: 'node22' }).code;
 
 const KEY = 'bycollection-cart';
 
@@ -276,5 +276,28 @@ describe('cart store state cases', { concurrency: false }, () => {
       assert.ok(storedIds(storage).includes('A'), 'stored A lost after hydration');
       assert.equal(m.useCartStore.getState().items.find((i) => i.productId === 'A')?.quantity, 2);
     });
+  });
+});
+
+test('external storage clear rehydration removes the stale in-memory cart', async()=>{
+  const storage=new FakeStorage();
+  await withCart('external-clear',storage,async m=>{
+    await hydrate(m);
+    assert.equal(m.useCartStore.getState().addItem(item('cleared-elsewhere')),true);
+    storage.clear();
+    await hydrate(m);
+    assert.deepEqual(m.useCartStore.getState().items,[]);
+    assert.equal(m.useCartStore.getState().totalItems(),0);
+  });
+});
+
+test('legacy migration write failure retains the write warning and saved raw bytes',async()=>{
+  const raw=JSON.stringify({state:{items:[item('old-write-blocked')]},version:0});
+  const storage=new FakeStorage({[KEY]:raw},{throwSet:true});
+  await withCart('migration-write',storage,async m=>{
+    await hydrate(m);
+    assert.equal(m.useCartStore.getState().storageWarning,m.CART_WARNING_WRITE);
+    assert.deepEqual(ids(m.useCartStore.getState().items),['old-write-blocked']);
+    assert.equal(storage.peek(KEY),raw);
   });
 });

@@ -51,7 +51,8 @@ export function Navbar() {
     void useCartStore.persist.rehydrate();
 
     const onStorage = (e: StorageEvent) => {
-      if (e.key === CART_STORAGE_KEY) void useCartStore.persist.rehydrate();
+      if (e.key === CART_STORAGE_KEY || e.key === null)
+        void useCartStore.persist.rehydrate();
     };
     const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
@@ -73,6 +74,17 @@ export function Navbar() {
   useEffect(() => {
     if (!mobileOpen) return;
 
+    const ownsFocus = (node: Element | null) =>
+      !!node &&
+      (node === toggleRef.current ||
+        !!document.getElementById(MENU_ID)?.contains(node));
+    // Track whether the toggle or menu owns focus. CSS lg:hidden can blur the
+    // focused element before the media query change event fires.
+    let focusOwned = ownsFocus(document.activeElement);
+    const onFocusIn = (e: FocusEvent) => {
+      focusOwned = ownsFocus(e.target as Element | null);
+    };
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setMobileOpen(false);
@@ -87,18 +99,19 @@ export function Navbar() {
     const mq = window.matchMedia("(min-width: 1024px)");
     const onMq = () => {
       if (!mq.matches) return;
-      const active = document.activeElement;
-      const focusWasInMenu =
-        active === toggleRef.current ||
-        !!document.getElementById(MENU_ID)?.contains(active);
+      const focusWasInMenu = ownsFocus(document.activeElement) || focusOwned;
+      focusOwned = false;
       setMobileOpen(false);
       if (focusWasInMenu) logoRef.current?.focus();
     };
 
+    document.addEventListener("focusin", onFocusIn);
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onPointer);
     mq.addEventListener("change", onMq);
     return () => {
+      focusOwned = false;
+      document.removeEventListener("focusin", onFocusIn);
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("pointerdown", onPointer);
       mq.removeEventListener("change", onMq);
@@ -203,6 +216,8 @@ export function Navbar() {
 
       <div
         id={MENU_ID}
+        role="navigation"
+        aria-label="Mobil menü"
         hidden={!mobileOpen}
         className="absolute inset-x-0 top-full max-h-[calc(100dvh-72px)] overflow-y-auto overscroll-contain border-b border-gold-100/70 bg-cream shadow-sm lg:hidden"
       >

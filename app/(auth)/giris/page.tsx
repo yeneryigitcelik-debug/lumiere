@@ -25,6 +25,10 @@ export default function LoginPage() {
 
   const inFlightRef = useRef(false);
   const mountedRef = useRef(true);
+  // Per-attempt epoch: each lock() bumps it; stale promise settlements are ignored.
+  const attemptRef = useRef(0);
+  // True current pending kind (avoids stale effect closures).
+  const pendingKindRef = useRef<Pending>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const errorRef = useRef<HTMLParagraphElement>(null);
 
@@ -37,6 +41,25 @@ export default function LoginPage() {
     };
   }, []);
 
+  // Lifecycle: Google signIn navigates away and keeps the form locked. If the browser
+  // restores this page from bfcache (pageshow.persisted) while a Google attempt is pending,
+  // the old attempt is invalidated and the form unlocked; inputs are kept. Credentials
+  // attempts and non-persisted pageshow events never unlock here.
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (!e.persisted || pendingKindRef.current !== "google") return;
+      attemptRef.current += 1;
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = null;
+      inFlightRef.current = false;
+      pendingKindRef.current = null;
+      setPending(null);
+      setSlow(false);
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, []);
+
   useEffect(() => {
     if (error) errorRef.current?.focus();
   }, [error]);
@@ -47,20 +70,24 @@ export default function LoginPage() {
   };
 
   const lock = (kind: Exclude<Pending, null>) => {
+    const id = ++attemptRef.current;
     inFlightRef.current = true;
+    pendingKindRef.current = kind;
     setPending(kind);
     setSlow(false);
     setError("");
     clearTimer();
     timerRef.current = setTimeout(() => {
       timerRef.current = null;
-      if (mountedRef.current) setSlow(true);
+      if (mountedRef.current && attemptRef.current === id) setSlow(true);
     }, SLOW_AFTER_MS);
+    return id;
   };
 
   const unlockWithError = (message: string) => {
     clearTimer();
     inFlightRef.current = false;
+    pendingKindRef.current = null;
     if (!mountedRef.current) return;
     setPending(null);
     setSlow(false);
@@ -70,7 +97,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (inFlightRef.current) return;
-    lock("credentials");
+    const id = lock("credentials");
 
     let result: Awaited<ReturnType<typeof signIn>> | undefined;
     try {
@@ -80,9 +107,12 @@ export default function LoginPage() {
         redirect: false,
       });
     } catch {
+      if (attemptRef.current !== id) return;
       unlockWithError(MSG_NETWORK);
       return;
     }
+
+    if (attemptRef.current !== id) return;
 
     // Page was left (e.g. user navigated to /kayit) while pending: never navigate.
     if (!mountedRef.current) {
@@ -106,11 +136,12 @@ export default function LoginPage() {
 
   const handleGoogle = async () => {
     if (inFlightRef.current) return;
-    lock("google");
+    const id = lock("google");
     try {
       // Default redirect: an undefined/resolved result means navigation is underway.
       await signIn("google", { callbackUrl: "/" });
     } catch {
+      if (attemptRef.current !== id) return;
       if (!mountedRef.current) {
         clearTimer();
         inFlightRef.current = false;
@@ -119,6 +150,7 @@ export default function LoginPage() {
       unlockWithError(MSG_GOOGLE);
       return;
     }
+    if (attemptRef.current !== id) return;
     if (!mountedRef.current) {
       clearTimer();
       inFlightRef.current = false;
@@ -181,7 +213,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               readOnly={isPending}
-              aria-invalid={error ? true : undefined}
+              aria-invalid={error === MSG_INVALID ? true : undefined}
               aria-describedby={error ? "login-error" : undefined}
               required
               className="mt-1.5 h-12 text-base read-only:bg-gold-50/40"
@@ -203,7 +235,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               readOnly={isPending}
-              aria-invalid={error ? true : undefined}
+              aria-invalid={error === MSG_INVALID ? true : undefined}
               aria-describedby={error ? "login-error" : undefined}
               required
               className="mt-1.5 h-12 text-base read-only:bg-gold-50/40"

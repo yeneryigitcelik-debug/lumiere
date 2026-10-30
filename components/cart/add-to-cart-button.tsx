@@ -86,7 +86,12 @@ export function AddToCartButton({
 
     if (!ok) {
       lockRef.current = null;
-      setFeedback({ kind: "error", key, message: MSG_ERROR });
+      const reason = useCartStore.getState().storageWarning;
+      setFeedback({
+        kind: "error",
+        key,
+        message: typeof reason === "string" && reason ? reason : MSG_ERROR,
+      });
       return;
     }
 

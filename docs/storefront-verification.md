@@ -30,11 +30,11 @@ DATABASE_URL=<boş-fixture-veritabanı> npx prisma db push
 > Uyarı: `DATABASE_URL` asla normal geliştirme, staging veya üretim veritabanını göstermemelidir. Seed veya müşteri verisi kullanılmaz.
 
 ```bash
-npm test                              # 16 sözleşme testi: 13 sepet + 3 SDK (loopback üzerinde gerçek HMAC, harici sağlayıcı yok)
+npm test                              # 18 sözleşme testi: 15 sepet + 3 SDK (loopback üzerinde gerçek HMAC, harici sağlayıcı yok)
 npm run lint:storefront               # yalnızca değişen UI + yeni test/fixture; 0 hata/uyarı
 npx tsc --noEmit --incremental false
 npx playwright install --with-deps chromium
-npm run test:browser                  # 25 tarayıcı testi, desktop + mobile
+npm run test:browser                  # 38 tarayıcı testi, desktop + mobile
 npm run build                         # varsayılan Next build (Turbopack)
 npm audit --omit=dev --audit-level=moderate
 ```
@@ -47,16 +47,20 @@ Tarayıcı testleri fixture dışındaki tüm HTTP isteklerini iptal eder, WebGL
 
 ## Tam lint durumu
 
-Tam depo `npm run lint` hâlâ başarısızdır: dokunulmamış admin/hesap/eski GPU dosyalarında 17 hata ve uyarılar vardır. Bunlar bastırılmadı veya düzeltilmedi; CI değişen dosyalar için lint çalıştırır.
+Başlangıçtaki dört dosyada eski HEAD kaynaklarıyla 17 hata yeniden üretildi. Kategori listesi okuma, profil düzenleme taslağı ve dekoratif GPU parçacıkları sınırlı olarak temizlendi; kural bastırılmadı. Tam depo lint sonucu: 0 hata, 2 önceden mevcut uyarı. CI tam depo lint çalıştırır.
 
 ## Yerel doğrulama notu
 
 Çevrimdışı ortamda tam webpack build; yalnızca framework font mock'u (yerel Arial) ve güncel Prisma motoru ile boş PG17 üzerinde sentetik kategori/ürün/varyant + rollback ile geçti. Font mock'u veya motor ayarı gönderilmez.
 
+## Yönetim ekranındaki mevcut eksik
+
+Kategori ekle/sil düğmeleri mevcut kaynakta placeholder; kategori yazma API uçları yok. Bu çalışma yeni CMS veya kategori CRUD eklemiyor; yalnızca liste okuma hatası ve bileşen yaşam döngüsünü düzeltir. Tam yönetim işleyişi tamamlandı iddiası yoktur.
+
 ## Sınırlamalar
 
 - Canlı by-collection alan adı bilinmiyor; canlı ortamda test yapılmadı.
-- Gerçek GPU shader veya cihaz performansı ölçülmedi (WebGL stub).
+- Gerçek GPU shader veya cihaz performansı ölçülmedi. Animasyonlu hero DOM/odak/hareket tercihi, yetenek taklidiyle ayrıca test edilir; bu GPU kanıtı değildir.
 - Canlı ödeme, e-posta, Google giriş, oturum ve checkout tamamlama testi yok.
 - Ekran görüntüleri yedek fontlarla alınmıştır.
 - Bu çalışma deploy veya merge içermez.

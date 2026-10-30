@@ -7,7 +7,7 @@ const test = base.extend({
     await context.route('**/*', (r) => (new URL(r.request().url()).origin === origin ? r.continue() : r.abort('blockedbyclient')));
     await context.addInitScript(() => {
       const orig = HTMLCanvasElement.prototype.getContext;
-      HTMLCanvasElement.prototype.getContext = function (type, ...a) { return /webgl/i.test(String(type)) ? null : orig.call(this, type, ...a); };
+      HTMLCanvasElement.prototype.getContext = function (type, ...a) { return /webgl/i.test(String(type)) ? (new URL(location.href).searchParams.has('enhanced') ? {getExtension:()=>({loseContext(){}})} : null) : orig.call(this, type, ...a); };
     });
     await runFixture(context);
   },
@@ -129,11 +129,20 @@ test.describe('mobile menu @mobile-only', () => {
   });
 
   test('resize to desktop with focus in menu moves focus to logo', async ({ page }) => {
+    for (let cycle=0;cycle<8;cycle++) {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await open(page);
+      await menu(page).getByRole('link', { name: 'Hakkımızda' }).focus();
+      await page.setViewportSize({ width: 1440, height: 1000 });
+      await expect(logo(page)).toBeFocused();
+      await expect(page.getByRole('button', { name: /^Menüyü (aç|kapat)$/, includeHidden: true })).toHaveAttribute('aria-expanded', 'false');
+    }
+    await page.setViewportSize({ width:390,height:844 });
     await open(page);
-    await menu(page).getByRole('link', { name: 'Hakkımızda' }).focus();
-    await page.setViewportSize({ width: 1440, height: 1000 });
-    await expect(logo(page)).toBeFocused();
-    await expect(page.getByRole('button', { name: /^Menüyü (aç|kapat)$/, includeHidden: true })).toHaveAttribute('aria-expanded', 'false');
+    const outside=page.getByRole('link',{name:'Koleksiyonu Keşfet',exact:true});
+    await outside.focus();
+    await page.setViewportSize({width:1440,height:1000});
+    await expect(outside).toBeFocused();
   });
 
   test('external route change closes', async ({ page }) => {
@@ -353,6 +362,8 @@ test.describe('login', () => {
     await fill(page);
     await submit(page).click();
     await expect(page.getByRole('alert')).toContainText('Bağlantı sorunu');
+    await expect(email(page)).not.toHaveAttribute('aria-invalid','true');
+    await expect(password(page)).not.toHaveAttribute('aria-invalid','true');
     await expect(submit(page)).toBeEnabled();
     await expect(email(page)).not.toHaveAttribute('readonly', /.*/);
     expect(await routerCalls(page)).toEqual([]);
@@ -461,5 +472,199 @@ test.describe('login', () => {
     expect(await page.evaluate(() => window.__auth.calls)).toEqual([{ provider: 'google', options: { callbackUrl: '/' } }]);
     expect(await routerCalls(page)).toEqual([]);
     await expect(page).toHaveURL(/[/]giris$/);
+  });
+});
+
+test.describe('profile draft and category read cleanup', () => {
+  const session = (page, name) => page.evaluate(value => {
+    window.__session = { data: { user: { name:value, email:'synthetic@example.invalid' } }, status:'authenticated' };
+    window.dispatchEvent(new Event('fixture:session'));
+  }, name);
+
+  test('late session initializes edit draft; session refresh preserves unsaved edits', async ({page}) => {
+    await page.goto('/hesabim');
+    await expect(page.getByRole('heading',{name:'Profil',exact:true})).toHaveCount(0);
+    await session(page,'Sentetik İlk Ad');
+    await expect(page.getByRole('heading',{name:'Profil',exact:true})).toBeVisible();
+    await page.getByRole('button',{name:'Düzenle',exact:true}).click();
+    await expect(page.getByLabel('Ad',{exact:true})).toHaveValue('Sentetik İlk Ad');
+    await page.getByLabel('Ad',{exact:true}).fill('Kaydedilmemiş Taslak');
+    await session(page,'Sentetik Yenilenen Ad');
+    await expect(page.getByLabel('Ad',{exact:true})).toHaveValue('Kaydedilmemiş Taslak');
+    await page.getByRole('button',{name:'İptal',exact:true}).click();
+    await expect(page.getByText('Sentetik Yenilenen Ad',{exact:true})).toBeVisible();
+    await page.getByRole('button',{name:'Düzenle',exact:true}).click();
+    await expect(page.getByLabel('Ad',{exact:true})).toHaveValue('Sentetik Yenilenen Ad');
+    await expect(page.getByLabel('Telefon',{exact:true})).toHaveAttribute('autocomplete','tel');
+  });
+
+  test('profile save retains exact name/phone payload with mocked PUT only', async ({page}) => {
+    const requests=[];
+    await page.route('**/api/profile',route=>{
+      requests.push({method:route.request().method(),body:route.request().postDataJSON()});
+      return route.fulfill({status:200,contentType:'application/json',body:'{}'});
+    });
+    await page.goto('/hesabim');
+    await session(page,'Sentetik Profil');
+    await page.getByRole('button',{name:'Düzenle',exact:true}).click();
+    await page.getByLabel('Ad',{exact:true}).fill('Sentetik Yeni Ad');
+    await page.getByLabel('Telefon',{exact:true}).fill('05000000000');
+    await page.getByRole('button',{name:'Kaydet',exact:true}).click();
+    await expect(page.getByRole('button',{name:'Düzenle',exact:true})).toBeVisible();
+    expect(requests).toEqual([{method:'PUT',body:{name:'Sentetik Yeni Ad',phone:'05000000000'}}]);
+    expect(await page.evaluate(()=>window.__sessionUpdates)).toEqual([{name:'Sentetik Yeni Ad'}]);
+    await expect(page.getByRole('link',{name:/Siparişlerim/})).toHaveAttribute('href','/hesabim/siparislerim');
+    await expect(page.getByRole('link',{name:/Adreslerim/})).toHaveAttribute('href','/hesabim/adreslerim');
+  });
+
+  test('category list reads existing protected GET contract through a synthetic response',async({page})=>{
+    const methods=[];
+    await page.route('**/api/admin/products?categoriesOnly=true',route=>{
+      methods.push(route.request().method());
+      return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({categories:[{id:'fixture-category',name:'Sentetik Kategori',slug:'fixture',isActive:true,sortOrder:0}]})});
+    });
+    await page.goto('/admin/kategoriler');
+    await expect(page.getByText('Sentetik Kategori',{exact:true})).toBeVisible();
+    expect(methods).toEqual(['GET']);
+    await expect(page.getByRole('alert')).toHaveCount(0);
+  });
+
+  test('category read failures are visible and do not reject unhandled',async({page})=>{
+    await page.route('**/api/admin/products?categoriesOnly=true',route=>route.abort('connectionreset'));
+    await page.goto('/admin/kategoriler');
+    await expect(page.getByRole('alert')).toBeVisible();
+    await expect(page.getByRole('alert')).toContainText(/yüklenemedi|alınamadı/);
+  });
+
+  test('late category read after unmount leaves chosen product route intact',async({page})=>{
+    let finish;
+    const waiting=new Promise(r=>finish=r);
+    await page.route('**/api/admin/products?categoriesOnly=true',async route=>{
+      await waiting;
+      await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({categories:[{id:'late',name:'Sentetik Geç Kategori',slug:'late',isActive:true,sortOrder:0}]})});
+    });
+    await page.goto('/admin/kategoriler');
+    await expect(page.getByRole('heading',{name:'Kategoriler',exact:true})).toBeVisible();
+    await page.evaluate(()=>{history.pushState({},'','/urunler');window.dispatchEvent(new PopStateEvent('popstate'))});
+    finish();
+    await expect(page.getByRole('heading',{level:1,name:'Sentetik Test Yüzüğü',exact:true})).toBeVisible();
+    await expect(page).toHaveURL(/[/]urunler$/);
+    await expect(page.getByText('Sentetik Geç Kategori',{exact:true})).toHaveCount(0);
+  });
+});
+
+test.describe('independent review lifecycle regressions',()=>{
+  const google=page=>page.getByRole('button',{name:/Google (ile Giriş Yap|açılıyor)/});
+  const submit=page=>page.getByRole('button',{name:/^(Giriş Yap|Giriş yapılıyor)/});
+  const restore=page=>page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));
+
+  test('bfcache restores Google form only after persisted pageshow',async({page})=>{
+    await page.goto('/giris');
+    await page.evaluate(()=>window.__auth.mode='undefined');
+    await google(page).click();
+    await expect(google(page)).toBeDisabled();
+    await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:false})));
+    await expect(google(page)).toBeDisabled();
+    await restore(page);
+    await expect(google(page)).toBeEnabled();
+    await expect(submit(page)).toBeEnabled();
+    await expect(page.getByLabel('E-posta')).not.toHaveAttribute('readonly',/.*/);
+  });
+
+  test('late pre-restoration OAuth rejection cannot unlock a new credentials attempt',async({page})=>{
+    await page.goto('/giris');
+    await page.evaluate(()=>window.__auth.mode='pending');
+    await google(page).click();
+    await expect(google(page)).toBeDisabled();
+    await restore(page);
+    await expect(submit(page)).toBeEnabled();
+    await page.getByLabel('E-posta').fill('synthetic@example.invalid');
+    await page.getByLabel('Şifre').fill('fixture-only');
+    await submit(page).click();
+    await expect(submit(page)).toBeDisabled();
+    await page.evaluate(()=>window.__auth.rejections[0](new Error('synthetic old OAuth rejection')));
+    await page.evaluate(()=>new Promise(r=>setTimeout(r,0)));
+    await expect(submit(page)).toBeDisabled();
+    await expect(page.getByRole('alert')).toHaveCount(0);
+    expect(await page.evaluate(()=>window.__auth.calls.map(c=>c.provider))).toEqual(['google','credentials']);
+    await page.evaluate(()=>window.__auth.pending[1]({ok:true,status:200,error:null,url:null}));
+    await expect.poll(()=>routerCalls(page)).toEqual([{method:'push',url:'/'},{method:'refresh'}]);
+  });
+
+  test('persisted pageshow never unlocks a pending credentials request',async({page})=>{
+    await page.goto('/giris');
+    await page.evaluate(()=>window.__auth.mode='pending');
+    await page.getByLabel('E-posta').fill('synthetic@example.invalid');
+    await page.getByLabel('Şifre').fill('fixture-only');
+    await submit(page).click();
+    await restore(page);
+    await expect(submit(page)).toBeDisabled();
+    expect(await page.evaluate(()=>window.__auth.calls.length)).toBe(1);
+  });
+
+  test('cart hydrates its own saved state without a Navbar boundary',async({page})=>{
+    await page.addInitScript(()=>localStorage.setItem('bycollection-cart',JSON.stringify({state:{items:[{productId:'standalone',name:'Sentetik Bağımsız Sepet',price:10,quantity:1,slug:'standalone'}]},version:0})));
+    await page.goto('/sepet?no-nav=1');
+    await expect(page.getByRole('banner')).toHaveCount(0);
+    await expect(page.getByRole('heading',{name:'Sepetim',exact:true})).toBeVisible();
+    await expect(page.getByRole('link',{name:/Sentetik Bağımsız Sepet/})).toBeVisible();
+  });
+
+  test('other-tab localStorage.clear clears the header count and cart lines',async({page})=>{
+    await page.goto('/urunler');
+    await expect(pdp(page).add).toBeEnabled();
+    await pdp(page).add.click();
+    await expect(cartLink(page)).toHaveAccessibleName('Sepet, 1 ürün');
+    await page.evaluate(()=>{localStorage.clear();window.dispatchEvent(new StorageEvent('storage',{key:null,storageArea:localStorage}))});
+    await expect(cartLink(page)).toHaveAccessibleName('Sepet');
+    expect(await cartQty(page)).toBe(0);
+  });
+
+  test('representability failure shows the exact store reason instead of a false success',async({page})=>{
+    await page.addInitScript(()=>localStorage.setItem('bycollection-cart',JSON.stringify({state:{items:[{productId:'large',name:'Sentetik Sınır',price:0,quantity:Number.MAX_SAFE_INTEGER,slug:'large'}]},version:1})));
+    await page.goto('/urunler');
+    await expect(pdp(page).add).toBeEnabled();
+    await pdp(page).add.click();
+    await expect(page.getByRole('alert')).toContainText('Sepet adedi veya tutarı');
+    await expect(pdp(page).add).toHaveAccessibleName('Sepete Ekle');
+  });
+});
+
+test.describe('enhanced hero DOM with a capability stub, no GPU claim',()=>{
+  test('enhanced first phase matches the static first viewport geometry',async({page},ti)=>{
+    await page.goto('/');
+    const title=page.getByRole('heading',{level:1,name:'Işığı Keşfet'});
+    const cta=page.getByRole('link',{name:'Koleksiyonu Keşfet',exact:true});
+    const before={title:await title.boundingBox(),cta:await cta.boundingBox()};
+    await page.emulateMedia({reducedMotion:'no-preference'});
+    await page.goto('/?enhanced=1');
+    await expect(page.locator('.hero-public')).toHaveAttribute('style',/height: 260vh/);
+    await expect(title).toBeVisible();
+    await expect(cta).toBeInViewport();
+    const after={title:await title.boundingBox(),cta:await cta.boundingBox()};
+    for(const element of ['title','cta'])for(const dimension of ['x','y','width','height'])expect(Math.abs(before[element][dimension]-after[element][dimension]),element+' '+dimension).toBeLessThanOrEqual(2);
+    await expect(page.getByRole('link',{name:'Hikâyemiz',exact:true})).toBeVisible();
+    await expect(page.locator('h1:visible')).toHaveCount(1);
+    await page.screenshot({path:ti.outputPath('enhanced-first-phase.png')});
+  });
+
+  test('inactive enhanced phase links are inert and reduced motion returns static hero',async({page},ti)=>{
+    await page.emulateMedia({reducedMotion:'no-preference'});
+    await page.goto('/?enhanced=1');
+    const hero=page.locator('.hero-public');
+    await expect(hero).toHaveAttribute('style',/height: 260vh/);
+    const initial=hero.locator('a').filter({hasText:'Koleksiyonu Keşfet'});
+    await page.evaluate(()=>{const el=document.querySelector('.hero-public');window.scrollTo({top:el.offsetTop+(el.offsetHeight-innerHeight)*.8,behavior:'instant'})});
+    await expect(hero.getByRole('link',{name:'Alışverişe Başla',exact:true})).toBeVisible();
+    await expect(initial).toHaveCount(1);
+    expect(await initial.evaluate(el=>Boolean(el.closest('[inert]')))).toBe(true);
+    await initial.evaluate(el=>el.focus());
+    expect(await initial.evaluate(el=>el===document.activeElement)).toBe(false);
+    await page.screenshot({path:ti.outputPath('enhanced-last-phase.png')});
+    await page.emulateMedia({reducedMotion:'reduce'});
+    await expect(hero).not.toHaveAttribute('style',/height: 260vh/);
+    await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+    await expect(page.getByRole('link',{name:'Koleksiyonu Keşfet',exact:true})).toBeInViewport();
+    await expect(page.locator('h1:visible')).toHaveCount(1);
   });
 });

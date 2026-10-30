@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Trash2, Minus, Plus, ArrowRight } from "lucide-react";
-import { useCartStore } from "@/stores/cart";
+import { ensureInitialHydration, useCartStore } from "@/stores/cart";
 import { formatPrice } from "@/lib/utils";
 import type { CartItem } from "@/types";
 
@@ -22,6 +22,11 @@ export default function CartPage() {
   const removeItem = useCartStore((s) => s.removeItem);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const totalPrice = useCartStore((s) => s.totalPrice);
+
+  // Own hydration independently of the Navbar; loading state stays until ready.
+  useEffect(() => {
+    ensureInitialHydration();
+  }, []);
 
   const [status, setStatus] = useState("");
   const focusTargetRef = useRef<string | null>(null);

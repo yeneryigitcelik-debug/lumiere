@@ -27,7 +27,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd 'pg_isready -U ci_fixture -d storefront_ci_fixture'
+          --health-cmd "pg_isready -U ci_fixture -d storefront_ci_fixture"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 20
@@ -53,8 +53,8 @@ jobs:
         run: npx prisma db push
       - name: Contract tests
         run: npm test
-      - name: Scoped storefront lint
-        run: npm run lint:storefront
+      - name: Full repository lint
+        run: npm run lint
       - name: Type check
         run: npx tsc --noEmit --incremental false
       - name: Install Playwright Chromium

@@ -10,6 +10,7 @@ Değişiklikler yalnızca storefront arayüzü, test/fixture dosyaları ve bağ�
 - **Navbar:** Erişilebilir mobil menü (ARIA durumları, odak yönetimi, Escape ile kapanma).
 - **Sepet:** Kalıcı veri migrasyonu, hydration uyumsuzluğu giderildi; okunamayan/engellenmiş depolama verisi silinmeden korunur.
 - **Varyant seçici / sepete ekle:** Erişilebilir seçim ve ekleme geri bildirimi.
+- **Profil:** Düzenleme taslağı oturum kimliğine bağlıdır; hesap değişince eski taslak ve bekleyen istemci işlemi yeni hesabı etkilemez. Yalnızca sentetik oturum ve sahte PUT ile doğrulandı.
 - **Giriş:** Asenkron gönderimde eski (stale) yanıtların durumu ezmesini önleyen koruma.
 - **Ürün 3D:** Yalnızca ürünün gerçek model URL'si kullanılır; sahte/jenerik model gösterilmez.
 - **Bağımlılıklar:** Next 16.4.3, Prisma 7.10.1 (client/adapter hizalı). `iyzipay` altındaki `postman-request` için resmi SDK önerisiyle uyumlu `qs 6.16.1` ve `uuid 11.1.1` override. Üretim audit bulguları 32 → 0.
@@ -34,7 +35,7 @@ npm test                              # 18 sözleşme testi: 15 sepet + 3 SDK (l
 npm run lint:storefront               # yalnızca değişen UI + yeni test/fixture; 0 hata/uyarı
 npx tsc --noEmit --incremental false
 npx playwright install --with-deps chromium
-npm run test:browser                  # 38 tarayıcı testi, desktop + mobile
+npm run test:browser                  # 40 tarayıcı testi, desktop + mobile
 npm run build                         # varsayılan Next build (Turbopack)
 npm audit --omit=dev --audit-level=moderate
 ```

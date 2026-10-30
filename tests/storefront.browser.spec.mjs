@@ -476,10 +476,10 @@ test.describe('login', () => {
 });
 
 test.describe('profile draft and category read cleanup', () => {
-  const session = (page, name) => page.evaluate(value => {
-    window.__session = { data: { user: { name:value, email:'synthetic@example.invalid' } }, status:'authenticated' };
+  const session = (page, name, id='fixture-user-a') => page.evaluate(({name:value,id}) => {
+    window.__session = { data: { user: { id, name:value, email:'synthetic@example.invalid' } }, status:'authenticated' };
     window.dispatchEvent(new Event('fixture:session'));
-  }, name);
+  }, {name,id});
 
   test('late session initializes edit draft; session refresh preserves unsaved edits', async ({page}) => {
     await page.goto('/hesabim');
@@ -666,5 +666,51 @@ test.describe('enhanced hero DOM with a capability stub, no GPU claim',()=>{
     await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
     await expect(page.getByRole('link',{name:'Koleksiyonu Keşfet',exact:true})).toBeInViewport();
     await expect(page.locator('h1:visible')).toHaveCount(1);
+  });
+});
+
+test.describe('profile draft ownership regression',()=>{
+  const owner=(page,id,name)=>page.evaluate(({id,name})=>{
+    window.__session={data:{user:{id,name,email:id+'@example.invalid'}},status:'authenticated'};
+    window.dispatchEvent(new Event('fixture:session'));
+  },{id,name});
+
+  test('changing session owner discards the previous user draft before another save',async({page})=>{
+    await page.goto('/hesabim');
+    await owner(page,'fixture-user-a','Sentetik Kullanıcı A');
+    await page.getByRole('button',{name:'Düzenle',exact:true}).click();
+    await page.getByLabel('Ad',{exact:true}).fill('A için kaydedilmemiş taslak');
+    await owner(page,'fixture-user-b','Sentetik Kullanıcı B');
+    await expect(page.getByRole('button',{name:'Düzenle',exact:true})).toBeVisible();
+    await expect(page.getByText('Sentetik Kullanıcı B',{exact:true})).toBeVisible();
+    await page.getByRole('button',{name:'Düzenle',exact:true}).click();
+    await expect(page.getByLabel('Ad',{exact:true})).toHaveValue('Sentetik Kullanıcı B');
+  });
+
+  test('late A profile response cannot update the new B session or its editor',async({page})=>{
+    let releaseResponse,markStarted;
+    const gate=new Promise(r=>releaseResponse=r),started=new Promise(r=>markStarted=r);
+    await page.route('**/api/profile',async route=>{
+      markStarted();
+      await gate;
+      try{await route.fulfill({status:200,contentType:'application/json',body:'{}'})}catch{/* Owned request may be aborted on old editor unmount. */}
+    });
+    await page.goto('/hesabim');
+    await owner(page,'fixture-user-a','Sentetik Kullanıcı A');
+    await page.getByRole('button',{name:'Düzenle',exact:true}).click();
+    await page.getByLabel('Ad',{exact:true}).fill('A için yeni ad');
+    const requestSettled=new Promise(resolve=>{
+      const done=request=>{if(request.url().endsWith('/api/profile')){page.off('requestfinished',done);page.off('requestfailed',done);resolve()}};
+      page.on('requestfinished',done);page.on('requestfailed',done);
+    });
+    await page.getByRole('button',{name:'Kaydet',exact:true}).click();
+    await started;
+    await owner(page,'fixture-user-b','Sentetik Kullanıcı B');
+    releaseResponse();
+    await requestSettled;
+    await page.evaluate(()=>new Promise(r=>setTimeout(r,0)));
+    await expect.poll(()=>page.evaluate(()=>window.__session.data.user.name)).toBe('Sentetik Kullanıcı B');
+    expect(await page.evaluate(()=>window.__sessionUpdates)).toEqual([]);
+    await expect(page.getByRole('button',{name:'Düzenle',exact:true})).toBeVisible();
   });
 });
